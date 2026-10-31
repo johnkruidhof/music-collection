@@ -63,7 +63,15 @@ app:
     base-url: https://api.discogs.com
     token: ${DISCOGS_TOKEN:}
     user-agent: MusicCollection/0.1 +https://github.com/johnkruidhof/music-collection
+    throttle:
+      min-interval: 1s          # 60 requests/minuut met token
+      max-retries: 2
+      retry-backoff: 2s
   musicbrainz:
     base-url: https://musicbrainz.org/ws/2
     cover-art-base-url: https://coverartarchive.org
     user-agent: MusicCollection/0.1 ( johnkruidhof@gmail.com )
+    throttle:
+      min-interval: 1100ms      # max 1 request/seconde, iets marge
+      max-retries: 2
+      retry-backoff: 2s

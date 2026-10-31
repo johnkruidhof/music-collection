@@ -8,9 +8,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.core.annotation.Order;
+
 import lombok.extern.slf4j.Slf4j;
 import nl.johnkruidhof.musiccollection.client.MetadataProvider;
+import nl.johnkruidhof.musiccollection.client.RequestThrottle;
+import nl.johnkruidhof.musiccollection.config.AppProperties;
 import nl.johnkruidhof.musiccollection.dto.lookup.ReleaseCandidateDto;
 import nl.johnkruidhof.musiccollection.dto.lookup.ReleaseSearchCriteria;
 import nl.johnkruidhof.musiccollection.dto.release.ReleaseDto;
@@ -21,11 +24,12 @@ import nl.johnkruidhof.musiccollection.mapper.DiscogsMapper;
 /**
  * Discogs als {@link MetadataProvider}. Fouten van Discogs (5xx, 429, time-outs ...) worden een
  * {@link ExternalLookupException}; een onbekende release geeft {@link Optional#empty()}.
- * Caching, rate limiting en retry zitten in de lookup-service (F-12).
+ * Rate limiting en retry via {@link RequestThrottle} ({@code app.discogs.throttle}); caching zit in de
+ * lookup-service. {@code @Order(1)}: Discogs is de primaire bron.
  */
 @Slf4j
 @Component
-@RequiredArgsConstructor
+@Order(1)
 public class DiscogsMetadataProvider implements MetadataProvider {
 
     static final String SOURCE_NAME = "Discogs";
@@ -34,6 +38,13 @@ public class DiscogsMetadataProvider implements MetadataProvider {
 
     private final DiscogsApi discogsApi;
     private final DiscogsMapper discogsMapper;
+    private final RequestThrottle throttle;
+
+    public DiscogsMetadataProvider(DiscogsApi discogsApi, DiscogsMapper discogsMapper, AppProperties appProperties) {
+        this.discogsApi = discogsApi;
+        this.discogsMapper = discogsMapper;
+        this.throttle = new RequestThrottle(SOURCE_NAME, appProperties.discogs().throttle());
+    }
 
     @Override
     public MetadataSource source() {
@@ -86,7 +97,7 @@ public class DiscogsMetadataProvider implements MetadataProvider {
 
     private <T> T call(String action, Supplier<T> request) {
         try {
-            return request.get();
+            return throttle.execute(request);
         } catch (RestClientException ex) {
             log.debug("Discogs: {} mislukt", action, ex);
             throw new ExternalLookupException(SOURCE_NAME, "Discogs: " + action + " mislukt: " + ex.getMessage(), ex);

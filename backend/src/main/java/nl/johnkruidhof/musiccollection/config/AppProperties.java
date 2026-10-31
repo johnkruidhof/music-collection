@@ -1,5 +1,6 @@
 package nl.johnkruidhof.musiccollection.config;
 
+import java.time.Duration;
 import java.util.List;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -18,10 +19,37 @@ public record AppProperties(Cors cors, Discogs discogs, MusicBrainz musicbrainz)
     }
 
     /** Discogs API — https://www.discogs.com/developers */
-    public record Discogs(String baseUrl, String token, String userAgent) {
+    public record Discogs(String baseUrl, String token, String userAgent, Throttle throttle) {
+        public Discogs {
+            throttle = throttle == null ? Throttle.DEFAULT : throttle;
+        }
     }
 
     /** MusicBrainz API — https://musicbrainz.org/doc/MusicBrainz_API */
-    public record MusicBrainz(String baseUrl, String coverArtBaseUrl, String userAgent) {
+    public record MusicBrainz(String baseUrl, String coverArtBaseUrl, String userAgent, Throttle throttle) {
+        public MusicBrainz {
+            throttle = throttle == null ? Throttle.DEFAULT : throttle;
+        }
+    }
+
+    /**
+     * Rate limiting en retry per externe bron.
+     *
+     * @param minInterval  minimale tijd tussen twee requests (Discogs 60/min → 1 s, MusicBrainz 1/s)
+     * @param maxRetries   aantal extra pogingen bij 429/502/503/504 of netwerkfouten
+     * @param retryBackoff wachttijd vóór de eerste extra poging; verdubbelt per poging
+     * @param maxWait      langer in de wachtrij → direct een fout i.p.v. de gebruiker laten wachten
+     */
+    public record Throttle(Duration minInterval, int maxRetries, Duration retryBackoff, Duration maxWait) {
+
+        public static final Throttle DEFAULT = new Throttle(null, 2, null, null);
+        public static final Throttle NONE = new Throttle(Duration.ZERO, 0, Duration.ZERO, Duration.ZERO);
+
+        public Throttle {
+            minInterval = minInterval == null ? Duration.ofSeconds(1) : minInterval;
+            retryBackoff = retryBackoff == null ? Duration.ofSeconds(1) : retryBackoff;
+            maxWait = maxWait == null ? Duration.ofSeconds(20) : maxWait;
+            maxRetries = Math.max(0, maxRetries);
+        }
     }
 }

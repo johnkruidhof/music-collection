@@ -172,9 +172,9 @@ Alle bronnen implementeren `client.MetadataProvider`.
 ```
 GET    /api/me                                   huidige gebruiker (aangemaakt bij eerste aanroep)   ✔
 
-GET    /api/lookup/barcode/{barcode}             kandidaten uit lokale catalogus + externe bronnen
-GET    /api/lookup/search?artist=&title=&year=&mediaType=   zoeken zonder barcode
-GET    /api/lookup/{source}/{externalId}         volledige details (incl. tracks) van één kandidaat
+GET    /api/lookup/barcode/{barcode}             kandidaten uit lokale catalogus + externe bronnen   ✔
+GET    /api/lookup/search?artist=&title=&year=&mediaType=   zoeken zonder barcode                ✔
+GET    /api/lookup/{source}/{externalId}         volledige details (incl. tracks) van één kandidaat   ✔
 
 GET    /api/collection?q=&mediaType=&sort=&page=&size=   eigen collectie (gepagineerd)
 POST   /api/collection                           toevoegen: { source, externalId } óf handmatige data
@@ -335,7 +335,11 @@ npm run format                 # Prettier; format:check doet hetzelfde zonder te
   details halen de cover alleen op als `cover-art-archive.front` waar is, met vaste URL's als fallback.
   RestClient-opbouw gedeeld in `config/HttpClientSupport`. MusicBrainz geeft al snel 503 boven
   1 req/s → rate limiting in F-12 is echt nodig.
-- [ ] **F-12** Lookup-service met normalisatie, lokale catalogus-check, caching, rate limiting + lookup-controller
+- [x] **F-12** Lookup-service met normalisatie, lokale catalogus-check, caching, rate limiting + lookup-controller
+  — `LookupService` (normalisatie via `Barcodes`, lokale catalogus zonder MANUAL-releases) →
+  `ExternalLookupService` (`@Cacheable`, providers op `@Order`: Discogs → MusicBrainz; storing +
+  geen resultaat = fout, zodat lege resultaten door storingen niet gecachet worden).
+  `RequestThrottle` per provider: `app.<bron>.throttle` (min-interval, max-retries, retry-backoff, max-wait).
 - [ ] **F-13** Collection CRUD-API (alleen eigen items), paginering, filters en zoeken
 - [ ] **F-14** Frontend: scan-flow met camera + batch-modus
 - [ ] **F-16** Frontend: zoeken op artiest/titel/jaar + kandidaat kiezen
