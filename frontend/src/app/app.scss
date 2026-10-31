@@ -28,6 +28,17 @@
   flex: 1;
 }
 
+.offline {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 13px;
+  background: var(--mat-sys-tertiary-container);
+  color: var(--mat-sys-on-tertiary-container);
+}
+
 .user {
   font-size: 14px;
 }
@@ -41,6 +52,18 @@
 @media (max-width: 600px) {
   .brand span,
   .nav .label,
+  .offline .label,
+  .offline {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 13px;
+    background: var(--mat-sys-tertiary-container);
+    color: var(--mat-sys-on-tertiary-container);
+  }
+
   .user {
     display: none;
   }
