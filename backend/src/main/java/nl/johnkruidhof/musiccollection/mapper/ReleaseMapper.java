@@ -30,6 +30,8 @@ public interface ReleaseMapper {
     @Mapping(target = "tracks", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "coverSourceUrl", ignore = true)
+    @Mapping(target = "coverCacheAttempts", ignore = true)
     Release toEntity(ReleaseDto release);
 
     @Mapping(target = "id", ignore = true)
@@ -41,6 +43,8 @@ public interface ReleaseMapper {
     @Mapping(target = "tracks", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "coverSourceUrl", ignore = true)
+    @Mapping(target = "coverCacheAttempts", ignore = true)
     Release toEntity(ManualReleaseRequest release);
 
     @Mapping(target = "id", ignore = true)
@@ -52,6 +56,8 @@ public interface ReleaseMapper {
     @Mapping(target = "tracks", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "coverSourceUrl", ignore = true)
+    @Mapping(target = "coverCacheAttempts", ignore = true)
     void updateEntity(ManualReleaseRequest request, @MappingTarget Release release);
 
     @AfterMapping

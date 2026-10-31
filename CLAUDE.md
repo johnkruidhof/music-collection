@@ -138,13 +138,13 @@ Zie `V1__initial_schema.sql`.
 ```
 app_user         id, keycloak_id (= JWT sub, uniek), username, email, display_name, created_at
 release          id, barcode, artist, title, release_year, media_type, format_details, label,
-                 catalog_number, country, cover_image_url, cover_thumbnail_url, source,
-                 discogs_id (uniek), musicbrainz_id (uniek), created_at, updated_at
+                 catalog_number, country, cover_image_url, cover_thumbnail_url, cover_source_url,
+                 cover_cache_attempts, source, discogs_id (uniek), musicbrainz_id (uniek), created_at, updated_at
 track            id, release_id, disc_number, position ("A1"), sort_order, title, duration_seconds, artist
 collection_item  id, user_id, release_id, condition_media, condition_sleeve, purchase_date,
                  purchase_price, purchase_location, storage_location, notes, added_at, updated_at
 cover_image      id, release_id (uniek, ON DELETE CASCADE), image, thumbnail (bytea, JPEG), content_type,
-                 created_at                                   — eigen covers, alleen MANUAL-releases (V2)
+                 created_at        — eigen uploads (MANUAL, V2) én lokaal gecachte externe covers (F-21)
 ```
 
 Enums: `MediaType` (VINYL, CD, DVD, BLU_RAY, CASSETTE, OTHER), `MetadataSource` (DISCOGS,
@@ -385,7 +385,10 @@ npm run format                 # Prettier; format:check doet hetzelfde zonder te
   gesorteerd op Goldmine-volgorde in de service). `/statistieken`: kerncijfers als tegels, verdelingen
   als `BarList` (één serie, één kleur). Ook gefixt: na inloggen via een diepe link kwam je op `/` uit
   (dubbele URL-codering van de OIDC-state en navigatie die door de eerste router-navigatie werd overschreven).
-- [ ] **F-21** Covers lokaal opslaan/cachen i.p.v. hotlinken
+- [x] **F-21** Covers lokaal opslaan/cachen i.p.v. hotlinken
+  — `CoverCacheService`: na import `@Async`, plus `@Scheduled` backfill (`app.covers.*`). Download buiten
+  de transactie (`CoverDownloader`, throttled), opgeslagen in `cover_image` zoals eigen uploads; originele
+  URL in `release.cover_source_url`, max. 3 pogingen (`cover_cache_attempts`, V3). Uit in tests.
 - [ ] **F-22** Import/export (CSV, Discogs collection export importeren)
 - [ ] **F-23** Dubbelen-detectie bij toevoegen ("je hebt deze al")
 - [ ] **F-24** Wishlist naast collectie

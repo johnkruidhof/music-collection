@@ -5,3 +5,8 @@ spring:
         jwt:
           issuer-uri: http://localhost/test
           jwk-set-uri: http://localhost/test/certs
+
+app:
+  covers:
+    # Geen echte downloads in tests; CoverCacheServiceIntegrationTest roept cache() direct aan.
+    cache-enabled: false

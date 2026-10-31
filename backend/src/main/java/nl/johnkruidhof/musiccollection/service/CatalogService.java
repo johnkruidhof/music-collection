@@ -27,6 +27,7 @@ public class CatalogService {
     private final LookupService lookupService;
     private final ExternalLookupService externalLookupService;
     private final ReleaseMapper releaseMapper;
+    private final CoverCacheService coverCacheService;
 
     /**
      * Id van de release in de catalogus; de eerste keer opgehaald bij de bron en opgeslagen.
@@ -72,6 +73,7 @@ public class CatalogService {
         try {
             Release saved = releaseRepository.save(releaseMapper.toEntity(details));
             log.info("Release {} geïmporteerd uit {}: {} - {}", externalId, source, saved.getArtist(), saved.getTitle());
+            coverCacheService.cacheInBackground(saved.getId());
             return saved.getId();
         } catch (DataIntegrityViolationException ex) {
             log.info("Release {} uit {} werd tegelijk geïmporteerd; bestaande gebruikt", externalId, source);

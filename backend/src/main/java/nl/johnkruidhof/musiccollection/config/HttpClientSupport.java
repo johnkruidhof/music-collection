@@ -18,7 +18,7 @@ final class HttpClientSupport {
     private HttpClientSupport() {
     }
 
-    /** RestClient-builder met base-URL, User-Agent en time-outs; volgt redirects (Cover Art Archive). */
+    /** RestClient-builder met (optioneel) base-URL, User-Agent en time-outs; volgt redirects (Cover Art Archive). */
     static RestClient.Builder restClient(RestClient.Builder builder, String baseUrl, String userAgent) {
         HttpClient httpClient = HttpClient.newBuilder()
                 .connectTimeout(CONNECT_TIMEOUT)
@@ -26,10 +26,10 @@ final class HttpClientSupport {
                 .build();
         JdkClientHttpRequestFactory requestFactory = new JdkClientHttpRequestFactory(httpClient);
         requestFactory.setReadTimeout(READ_TIMEOUT);
-        return builder.clone()
-                .baseUrl(baseUrl)
+        RestClient.Builder configured = builder.clone()
                 .requestFactory(requestFactory)
                 .defaultHeader(HttpHeaders.USER_AGENT, userAgent);
+        return baseUrl == null ? configured : configured.baseUrl(baseUrl);
     }
 
     static <T> T httpService(RestClient restClient, Class<T> serviceType) {

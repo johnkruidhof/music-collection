@@ -10,7 +10,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * Waarden komen uit application.yml en kunnen overschreven worden met env-vars.
  */
 @ConfigurationProperties(prefix = "app")
-public record AppProperties(Cors cors, Discogs discogs, MusicBrainz musicbrainz) {
+public record AppProperties(Cors cors, Discogs discogs, MusicBrainz musicbrainz, Covers covers) {
+
+    public AppProperties {
+        covers = covers == null ? Covers.DEFAULT : covers;
+    }
 
     public record Cors(List<String> allowedOrigins) {
         public Cors {
@@ -50,6 +54,25 @@ public record AppProperties(Cors cors, Discogs discogs, MusicBrainz musicbrainz)
             retryBackoff = retryBackoff == null ? Duration.ofSeconds(1) : retryBackoff;
             maxWait = maxWait == null ? Duration.ofSeconds(20) : maxWait;
             maxRetries = Math.max(0, maxRetries);
+        }
+    }
+
+    /**
+     * Covers van externe bronnen lokaal cachen (F-21).
+     *
+     * @param cacheEnabled  na import en in de periodieke backfill automatisch downloaden
+     * @param maxAttempts   na zoveel mislukte downloads wordt een release overgeslagen
+     * @param batchSize     aantal releases per backfill-ronde
+     * @param minInterval   minimale tijd tussen twee downloads (vriendelijk voor de image-CDN's)
+     */
+    public record Covers(boolean cacheEnabled, int maxAttempts, int batchSize, Duration minInterval) {
+
+        public static final Covers DEFAULT = new Covers(true, 3, 25, null);
+
+        public Covers {
+            maxAttempts = maxAttempts <= 0 ? 3 : maxAttempts;
+            batchSize = batchSize <= 0 ? 25 : batchSize;
+            minInterval = minInterval == null ? Duration.ofMillis(500) : minInterval;
         }
     }
 }
