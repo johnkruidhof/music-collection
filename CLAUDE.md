@@ -252,7 +252,7 @@ src/app/
 ```
 
 Routes: `/` (home), `/collectie`, `/toevoegen` — de laatste twee achter `authGuard`.
-`/toevoegen` heeft tabs als child-routes: `scannen`, `zoeken`, `handmatig` (query-param `barcode`
+`/toevoegen` heeft tabs als child-routes: `scannen`, `zoeken`, `luisteren`, `handmatig` (query-param `barcode`
 vult het zoek-/handmatig-formulier voor na een mislukte scan).
 De OIDC-issuer wordt afgeleid van `window.location.origin` (`/auth/realms/music`), zodat één build
 werkt op localhost, een LAN-IP en later een domein; `environment.development.ts` overschrijft dit
@@ -443,7 +443,10 @@ npm run format                 # Prettier; format:check doet hetzelfde zonder te
     - **AcoustID/Chromaprint** — gratis, maar bedoeld voor schone/volledige audiobestanden.
   - Resultaat (artiest/titel/ISRC) → match op MusicBrainz/Discogs → releases tonen
     → "Toevoegen aan collectie" of "Staat al in je collectie".
-- [ ] **F-31** Frontend: knop "Luister" in de toevoeg-flow
+- [x] **F-31** Frontend: knop "Luister" in de toevoeg-flow
+  — Tab `/toevoegen/luisteren`: `AudioRecorderService` (10 s `MediaRecorder`, WebM/Opus of MP4/AAC,
+  echo-/ruisonderdrukking uit, niveaumeter) → `POST /api/recognize` → nummer, "Staat al in je collectie",
+  kandidaten (toevoegen / verlanglijst). Zonder sleutel uitleg over `AUDD_API_TOKEN`.
 - [ ] **F-32** "Welke van mijn platen is dit?"-modus: herkenning beperken tot eigen collectie
 
 ### Fase 4 — Publiek online (samen met de gebruiker uitwerken)
