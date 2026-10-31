@@ -95,6 +95,18 @@ describe('CollectionPage', () => {
     );
   });
 
+  it('selecteert de chip "Alle" zonder type-filter en wist het filter bij uitzetten', async () => {
+    const { fixture, page, el, router } = await open('/collectie?type=CD');
+    page.onTypeChip(undefined);
+    await fixture.whenStable();
+
+    expect(router.url).toBe('/collectie');
+    const selected = el.querySelector(
+      'mat-chip-option[aria-selected="true"], .mat-mdc-chip-selected',
+    );
+    expect(selected?.textContent).toContain('Alle');
+  });
+
   it('onthoudt de lijstweergave', async () => {
     const { fixture, page, el } = await open('/collectie');
 

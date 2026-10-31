@@ -101,7 +101,7 @@
 
     <section class="own">
       <h2>Mijn exemplaar</h2>
-      <form (ngSubmit)="saveFields()">
+      <form [formGroup]="fields" (ngSubmit)="saveFields()">
         <app-collection-fields-form [form]="fields" />
         <div class="form-actions">
           <button mat-flat-button type="submit" [disabled]="fields.pristine || saving()">

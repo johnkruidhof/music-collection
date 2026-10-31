@@ -144,6 +144,23 @@ describe('CollectionItemPage', () => {
     expect(page.fields.pristine).toBe(true);
   });
 
+  it('slaat op via de knop zonder de pagina te verlaten', async () => {
+    const { fixture, page, el } = await open();
+    page.fields.controls.notes.setValue('Eerste persing');
+    page.fields.markAsDirty();
+    await fixture.whenStable();
+
+    const button = Array.from(el.querySelectorAll('button')).find((b) =>
+      b.textContent?.includes('Opslaan'),
+    );
+    button?.click();
+
+    expect(collectionApi.update).toHaveBeenCalledWith(
+      'item-1',
+      expect.objectContaining({ notes: 'Eerste persing' }),
+    );
+  });
+
   it('toont "Bewerken" bij een handmatige release', async () => {
     collectionApi.get.mockReturnValue(of(item({ source: 'MANUAL', discogsId: null })));
     const { el } = await open();

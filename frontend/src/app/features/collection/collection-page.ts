@@ -131,6 +131,14 @@ export class CollectionPage {
     this.navigate({ mediaType, page: 0 });
   }
 
+  /** Chip "Alle" heeft de waarde 'ALL'; een chip uitzetten (undefined) betekent ook alle types. */
+  onTypeChip(value: MediaType | 'ALL' | undefined): void {
+    const mediaType = !value || value === 'ALL' ? null : value;
+    if (mediaType !== this.query().mediaType) {
+      this.setMediaType(mediaType);
+    }
+  }
+
   setSort(sort: string): void {
     this.navigate({ sort, page: 0 });
   }

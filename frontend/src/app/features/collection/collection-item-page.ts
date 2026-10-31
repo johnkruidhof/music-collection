@@ -1,5 +1,6 @@
 import { DatePipe, Location } from '@angular/common';
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
@@ -56,6 +57,7 @@ export function sourceUrl(release: Release): string | null {
     DatePipe,
     DurationPipe,
     MediaTypePipe,
+    ReactiveFormsModule,
     RouterLink,
     SourcePipe,
     MatButtonModule,

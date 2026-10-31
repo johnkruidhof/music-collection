@@ -42,10 +42,10 @@
 <mat-chip-listbox
   class="types"
   aria-label="Filter op type"
-  [value]="query().mediaType"
-  (change)="setMediaType($event.value ?? null)"
+  [value]="query().mediaType ?? 'ALL'"
+  (change)="onTypeChip($event.value)"
 >
-  <mat-chip-option [value]="null" [selected]="!query().mediaType">Alle</mat-chip-option>
+  <mat-chip-option value="ALL">Alle</mat-chip-option>
   @for (type of mediaTypes; track type) {
     <mat-chip-option [value]="type">{{ type | mediaType }}</mat-chip-option>
   }
