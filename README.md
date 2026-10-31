@@ -28,8 +28,10 @@ Nieuwe gebruikers kunnen zichzelf registreren via **Account aanmaken**.
 
 De camera werkt in de browser alleen via HTTPS. Caddy maakt daarvoor een eigen, lokaal certificaat.
 
-1. Zet in `.env` `APP_HOST` op het IP-adres van je computer (bijv. `192.168.1.50`) en herstart:
-   `docker compose up -d`
+1. Zet in `.env` `APP_HOST` op het IP-adres van je computer (bijv. `192.168.1.50`) en herstart
+   **alle** services: `docker compose up -d` (zonder servicenamen). Caddy, Keycloak en de backend
+   moeten hetzelfde adres gebruiken; open de app daarna via `https://<APP_HOST>`, ook op je computer
+   (`https://localhost` werkt dan niet meer).
 2. Haal het root-certificaat van Caddy op:
    `docker compose cp caddy:/data/caddy/pki/authorities/local/root.crt ./caddy-root.crt`
 3. Installeer `caddy-root.crt` als vertrouwd certificaat op je telefoon en computer:

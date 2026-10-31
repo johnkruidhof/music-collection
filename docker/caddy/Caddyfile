@@ -3,6 +3,10 @@
 	# Bij publiek online gaan: deze regel weghalen en APP_HOST op een echt domein zetten,
 	# dan haalt Caddy automatisch een Let's Encrypt-certificaat op.
 	local_certs
+
+	# Bij een IP-adres sturen browsers geen SNI mee; zonder dit kiest Caddy geen certificaat
+	# en faalt de TLS-handshake ("internal error").
+	default_sni {$APP_HOST:localhost}
 }
 
 {$APP_HOST:localhost} {
