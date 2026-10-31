@@ -60,7 +60,8 @@ public class LookupService {
                 .orElseThrow(() -> new ResourceNotFoundException("Release", source + "/" + externalId));
     }
 
-    Optional<Release> findLocal(MetadataSource source, String externalId) {
+    /** Een eerder geïmporteerde release van deze bron. */
+    public Optional<Release> findLocal(MetadataSource source, String externalId) {
         return switch (source) {
             case DISCOGS -> releaseRepository.findByDiscogsId(externalId);
             case MUSICBRAINZ -> releaseRepository.findByMusicbrainzId(externalId);
