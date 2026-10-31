@@ -1,0 +1,4 @@
+# Shell-scripts altijd met LF, ook bij een checkout op Windows
+mvnw text eol=lf
+*.sh text eol=lf
+*.cmd text eol=crlf
