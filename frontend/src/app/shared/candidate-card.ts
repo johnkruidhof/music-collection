@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -45,6 +45,12 @@ import { MediaTypePipe, SourcePipe } from './label.pipes';
         </div>
       }
       <div class="source">{{ candidate().source | source }}</div>
+      @if (owned() > 0) {
+        <div class="owned">
+          <mat-icon inline>library_add_check</mat-icon>
+          Al in je collectie{{ owned() > 1 ? ' (' + owned() + '×)' : '' }}
+        </div>
+      }
     </div>
     <div class="actions">
       @if (added()) {
@@ -56,7 +62,7 @@ import { MediaTypePipe, SourcePipe } from './label.pipes';
           } @else {
             <mat-icon>add</mat-icon>
           }
-          Toevoegen
+          {{ owned() > 0 ? 'Nog een exemplaar' : 'Toevoegen' }}
         </button>
       }
       <ng-content />
@@ -107,6 +113,17 @@ import { MediaTypePipe, SourcePipe } from './label.pipes';
     .source {
       margin-top: 4px;
     }
+    .owned {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 6px;
+      padding: 2px 8px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      background: var(--mat-sys-tertiary-container);
+      color: var(--mat-sys-on-tertiary-container);
+    }
     .actions {
       grid-area: actions;
       display: flex;
@@ -141,4 +158,6 @@ export class CandidateCard {
   readonly busy = input(false);
   readonly added = input(false);
   readonly add = output<ReleaseCandidate>();
+
+  protected readonly owned = computed(() => this.candidate().ownedCount ?? 0);
 }

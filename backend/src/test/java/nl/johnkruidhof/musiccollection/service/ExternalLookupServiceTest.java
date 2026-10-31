@@ -109,6 +109,6 @@ class ExternalLookupServiceTest {
 
     static ReleaseCandidateDto candidate(MetadataSource source, String externalId) {
         return new ReleaseCandidateDto(source, externalId, "Radiohead", "OK Computer", 1997, MediaType.CD,
-                "CD, Album", "Parlophone", "NODATA 02", "UK", "724385522925", null);
+                "CD, Album", "Parlophone", "NODATA 02", "UK", "724385522925", null, null);
     }
 }

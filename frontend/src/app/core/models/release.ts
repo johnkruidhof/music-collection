@@ -36,6 +36,8 @@ export interface ReleaseCandidate {
   country: string | null;
   barcode: string | null;
   coverThumbnailUrl: string | null;
+  /** Aantal exemplaren dat de gebruiker al heeft (F-23); null = onbekend. */
+  ownedCount?: number | null;
 }
 
 export interface Track {

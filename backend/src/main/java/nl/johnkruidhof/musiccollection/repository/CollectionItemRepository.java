@@ -1,5 +1,7 @@
 package nl.johnkruidhof.musiccollection.repository;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -9,6 +11,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 
 import nl.johnkruidhof.musiccollection.entity.CollectionItem;
 
@@ -31,4 +34,25 @@ public interface CollectionItemRepository extends JpaRepository<CollectionItem, 
     long countByReleaseId(UUID releaseId);
 
     long countByUserIdAndReleaseId(UUID userId, UUID releaseId);
+
+    /** Aantal exemplaren per extern id (F-23). */
+    interface ExternalIdCount {
+        String getExternalId();
+
+        long getCount();
+    }
+
+    @Query("""
+            select r.discogsId as externalId, count(ci) as count
+            from CollectionItem ci join ci.release r
+            where ci.user.id = :userId and r.discogsId in :discogsIds
+            group by r.discogsId""")
+    List<ExternalIdCount> countOwnedByDiscogsIds(UUID userId, Collection<String> discogsIds);
+
+    @Query("""
+            select r.musicbrainzId as externalId, count(ci) as count
+            from CollectionItem ci join ci.release r
+            where ci.user.id = :userId and r.musicbrainzId in :musicbrainzIds
+            group by r.musicbrainzId""")
+    List<ExternalIdCount> countOwnedByMusicbrainzIds(UUID userId, Collection<String> musicbrainzIds);
 }

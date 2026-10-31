@@ -74,7 +74,7 @@ class MusicBrainzMetadataProviderTest {
         assertThat(candidates.getFirst()).isEqualTo(new ReleaseCandidateDto(
                 MetadataSource.MUSICBRAINZ, MBID, "Radiohead", "OK Computer", 1997, MediaType.CD,
                 "CD", "Capitol Records", "CDP 7243 8 55229 2 5", "US", "724385522925",
-                coverArtArchive.baseUrl() + "/release/" + MBID + "/front-250"));
+                coverArtArchive.baseUrl() + "/release/" + MBID + "/front-250", null));
 
         ReleaseCandidateDto vinyl = candidates.get(1);
         assertThat(vinyl.mediaType()).isEqualTo(MediaType.VINYL);

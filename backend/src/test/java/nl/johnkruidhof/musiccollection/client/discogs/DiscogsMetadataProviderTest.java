@@ -72,7 +72,7 @@ class DiscogsMetadataProviderTest {
         assertThat(candidates.getFirst()).isEqualTo(new ReleaseCandidateDto(
                 MetadataSource.DISCOGS, "2149389", "Radiohead", "OK Computer", 1997, MediaType.VINYL,
                 "Vinyl, LP, Album", "Parlophone", "NODATA 02", "UK", "724385522912",
-                "https://i.discogs.com/thumb-2149389.jpg"));
+                "https://i.discogs.com/thumb-2149389.jpg", null));
 
         // Lege velden van Discogs ("" en spacer.gif) worden null.
         ReleaseCandidateDto cd = candidates.get(1);

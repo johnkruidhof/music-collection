@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,24 +31,28 @@ public class LookupService {
     private final ReleaseRepository releaseRepository;
     private final ExternalLookupService externalLookupService;
     private final ReleaseMapper releaseMapper;
+    private final OwnershipService ownershipService;
+    private final UserService userService;
 
-    @Transactional(readOnly = true)
-    public List<ReleaseCandidateDto> lookupBarcode(String barcode) {
+    /** Kandidaten met {@code ownedCount}: hoeveel exemplaren de gebruiker er al van heeft (F-23). */
+    @Transactional
+    public List<ReleaseCandidateDto> lookupBarcode(Jwt jwt, String barcode) {
         String normalized = Barcodes.normalize(barcode);
         List<Release> local = releaseRepository.findByBarcodeInAndSourceNot(Barcodes.variants(normalized),
                 MetadataSource.MANUAL);
-        if (!local.isEmpty()) {
-            return local.stream().map(releaseMapper::toCandidate).toList();
-        }
-        return externalLookupService.findByBarcode(normalized);
+        List<ReleaseCandidateDto> candidates = local.isEmpty()
+                ? externalLookupService.findByBarcode(normalized)
+                : local.stream().map(releaseMapper::toCandidate).toList();
+        return ownershipService.withOwnedCounts(userService.getOrCreate(jwt).getId(), candidates);
     }
 
-    public List<ReleaseCandidateDto> search(ReleaseSearchCriteria criteria) {
+    public List<ReleaseCandidateDto> search(Jwt jwt, ReleaseSearchCriteria criteria) {
         if (isBlank(criteria.artist()) && isBlank(criteria.title())) {
             throw new InvalidRequestException("Vul minstens een artiest of een titel in.");
         }
-        return externalLookupService.search(new ReleaseSearchCriteria(
+        List<ReleaseCandidateDto> candidates = externalLookupService.search(new ReleaseSearchCriteria(
                 strip(criteria.artist()), strip(criteria.title()), criteria.year(), criteria.mediaType()));
+        return ownershipService.withOwnedCounts(userService.getOrCreate(jwt).getId(), candidates);
     }
 
     /** Uit de lokale catalogus als de release daar al staat (met id), anders van de externe bron. */

@@ -397,7 +397,10 @@ npm run format                 # Prettier; format:check doet hetzelfde zonder te
   Import: `POST /api/collection/import/discogs` start een `@Async`-taak (`ImportWorker`), voortgang via
   `GET /api/collection/import/{id}|latest`. Per release wordt alleen het tekort aan exemplaren toegevoegd
   (opnieuw importeren is veilig). Taken staan in het geheugen (weg na herstart). Eigen-formaat-import nog niet.
-- [ ] **F-23** Dubbelen-detectie bij toevoegen ("je hebt deze al")
+- [x] **F-23** Dubbelen-detectie bij toevoegen ("je hebt deze al")
+  — Kandidaten hebben `ownedCount`; `OwnershipService` vult die per gebruiker ná de (gedeelde) cache in met
+  twee groepsquery's. `CandidateCard` toont "Al in je collectie (n×)" en "Nog een exemplaar". Handmatige
+  invoer wordt (nog) niet op dubbelen gecontroleerd.
 - [ ] **F-24** Wishlist naast collectie
 - [ ] **F-26** PWA: installeerbaar op telefoon, offline collectie bekijken
 - [ ] **F-27** Admin-scherm: catalogus opschonen, releases samenvoegen

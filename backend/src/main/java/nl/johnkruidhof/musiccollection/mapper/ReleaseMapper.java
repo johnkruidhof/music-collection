@@ -23,6 +23,7 @@ public interface ReleaseMapper {
 
     /** Een release uit de lokale catalogus als kandidaat; {@code externalId} hoort bij de bron. */
     @Mapping(target = "externalId", expression = "java(externalId(release))")
+    @Mapping(target = "ownedCount", ignore = true)
     ReleaseCandidateDto toCandidate(Release release);
 
     /** Een release van een externe bron opslaan in de catalogus; tracks via {@link #addTracks}. */
