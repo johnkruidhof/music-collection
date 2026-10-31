@@ -26,6 +26,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/add/scan/scan-page').then((m) => m.ScanPage),
         title: 'Scannen',
       },
+      {
+        path: 'zoeken',
+        loadComponent: () => import('./features/add/search/search-page').then((m) => m.SearchPage),
+        title: 'Zoeken',
+      },
     ],
   },
   { path: '**', redirectTo: '' },

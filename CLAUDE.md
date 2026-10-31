@@ -354,7 +354,9 @@ npm run format                 # Prettier; format:check doet hetzelfde zonder te
   codes doorkomen), `ScanPage` als state machine; handmatige barcode-invoer als fallback. Gedeeld:
   `core/models`, `core/api` (lookup, collection), `shared/` (Cover met placeholder, CandidateCard,
   label-pipes, `errorMessage` uit ProblemDetail).
-- [ ] **F-16** Frontend: zoeken op artiest/titel/jaar + kandidaat kiezen
+- [x] **F-16** Frontend: zoeken op artiest/titel/jaar + kandidaat kiezen
+  — `/toevoegen/zoeken`: criteria in de query-params (terug/verversen werkt), tracks per kandidaat
+  openklappen (`GET /api/lookup/{source}/{id}`), "Handmatig invoeren" neemt de criteria mee.
 - [ ] **F-17** Frontend: handmatig toevoegen/bewerken (incl. tracks en eigen cover-upload)
 - [ ] **F-18** Frontend: collectie-overzicht (grid met covers / lijst), filters op type, zoeken, sorteren
 - [ ] **F-19** Frontend: detailpagina met tracklist en eigen velden (staat, locatie, notities)
