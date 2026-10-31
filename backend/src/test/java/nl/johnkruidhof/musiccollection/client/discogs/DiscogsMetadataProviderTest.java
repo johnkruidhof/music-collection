@@ -10,6 +10,7 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMoc
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,6 +20,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.web.client.RestClient;
 
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
+import com.github.tomakehurst.wiremock.stubbing.Scenario;
 
 import nl.johnkruidhof.musiccollection.TestFixtures;
 import nl.johnkruidhof.musiccollection.config.AppProperties;
@@ -46,9 +48,13 @@ class DiscogsMetadataProviderTest {
 
     @BeforeEach
     void setUp() {
-        DiscogsApi api = DiscogsClientConfig.createDiscogsApi(RestClient.builder(),
-                new AppProperties.Discogs(discogs.baseUrl(), TOKEN, USER_AGENT));
-        provider = new DiscogsMetadataProvider(api, new DiscogsMapperImpl());
+        provider = provider(AppProperties.Throttle.NONE);
+    }
+
+    private static DiscogsMetadataProvider provider(AppProperties.Throttle throttle) {
+        AppProperties.Discogs properties = new AppProperties.Discogs(discogs.baseUrl(), TOKEN, USER_AGENT, throttle);
+        DiscogsApi api = DiscogsClientConfig.createDiscogsApi(RestClient.builder(), properties);
+        return new DiscogsMetadataProvider(api, new DiscogsMapperImpl(), new AppProperties(null, properties, null));
     }
 
     @Test
@@ -184,6 +190,29 @@ class DiscogsMetadataProviderTest {
 
         assertThatThrownBy(() -> provider.findByBarcode("724385522912"))
                 .isInstanceOf(ExternalLookupException.class);
+    }
+
+    @Test
+    void temporaryErrorIsRetried() {
+        discogs.stubFor(get("/releases/2149389").inScenario("retry").whenScenarioStateIs(Scenario.STARTED)
+                .willReturn(aResponse().withStatus(503)).willSetStateTo("hersteld"));
+        discogs.stubFor(get("/releases/2149389").inScenario("retry").whenScenarioStateIs("hersteld")
+                .willReturn(okJson(fixture("release.json"))));
+        DiscogsMetadataProvider withRetry = provider(
+                new AppProperties.Throttle(Duration.ZERO, 1, Duration.ZERO, Duration.ofSeconds(1)));
+
+        assertThat(withRetry.getDetails("2149389")).isPresent();
+        discogs.verify(2, getRequestedFor(urlPathEqualTo("/releases/2149389")));
+    }
+
+    @Test
+    void notFoundIsNotRetried() {
+        discogs.stubFor(get("/releases/999").willReturn(aResponse().withStatus(404)));
+        DiscogsMetadataProvider withRetry = provider(
+                new AppProperties.Throttle(Duration.ZERO, 2, Duration.ZERO, Duration.ofSeconds(1)));
+
+        assertThat(withRetry.getDetails("999")).isEmpty();
+        discogs.verify(1, getRequestedFor(urlPathEqualTo("/releases/999")));
     }
 
     private static String fixture(String name) {

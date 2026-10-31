@@ -51,7 +51,7 @@ class MusicBrainzMetadataProviderTest {
     @BeforeEach
     void setUp() {
         AppProperties.MusicBrainz properties = new AppProperties.MusicBrainz(
-                musicbrainz.baseUrl(), coverArtArchive.baseUrl(), USER_AGENT);
+                musicbrainz.baseUrl(), coverArtArchive.baseUrl(), USER_AGENT, AppProperties.Throttle.NONE);
         provider = new MusicBrainzMetadataProvider(
                 MusicBrainzClientConfig.createMusicBrainzApi(RestClient.builder(), properties),
                 MusicBrainzClientConfig.createCoverArtArchiveApi(RestClient.builder(), properties),

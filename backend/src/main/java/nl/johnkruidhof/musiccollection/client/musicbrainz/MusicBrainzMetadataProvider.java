@@ -6,12 +6,14 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 
 import lombok.extern.slf4j.Slf4j;
 import nl.johnkruidhof.musiccollection.client.MetadataProvider;
+import nl.johnkruidhof.musiccollection.client.RequestThrottle;
 import nl.johnkruidhof.musiccollection.config.AppProperties;
 import nl.johnkruidhof.musiccollection.dto.lookup.ReleaseCandidateDto;
 import nl.johnkruidhof.musiccollection.dto.lookup.ReleaseSearchCriteria;
@@ -24,10 +26,12 @@ import nl.johnkruidhof.musiccollection.mapper.MusicBrainzMapper;
  * MusicBrainz als {@link MetadataProvider} (fallback na Discogs), met covers uit het Cover Art Archive.
  * Fouten van MusicBrainz worden een {@link ExternalLookupException}; een onbekende release geeft
  * {@link Optional#empty()}. Een haperend Cover Art Archive laat de lookup niet mislukken.
- * Caching, rate limiting (1 req/s) en retry zitten in de lookup-service (F-12).
+ * Rate limiting (1 req/s) en retry via {@link RequestThrottle} ({@code app.musicbrainz.throttle}); het
+ * Cover Art Archive valt daar buiten. {@code @Order(2)}: na Discogs.
  */
 @Slf4j
 @Component
+@Order(2)
 public class MusicBrainzMetadataProvider implements MetadataProvider {
 
     static final String SOURCE_NAME = "MusicBrainz";
@@ -38,6 +42,7 @@ public class MusicBrainzMetadataProvider implements MetadataProvider {
     private final CoverArtArchiveApi coverArtArchiveApi;
     private final MusicBrainzMapper musicBrainzMapper;
     private final String coverArtBaseUrl;
+    private final RequestThrottle throttle;
 
     public MusicBrainzMetadataProvider(MusicBrainzApi musicBrainzApi, CoverArtArchiveApi coverArtArchiveApi,
             MusicBrainzMapper musicBrainzMapper, AppProperties appProperties) {
@@ -45,6 +50,7 @@ public class MusicBrainzMetadataProvider implements MetadataProvider {
         this.coverArtArchiveApi = coverArtArchiveApi;
         this.musicBrainzMapper = musicBrainzMapper;
         this.coverArtBaseUrl = appProperties.musicbrainz().coverArtBaseUrl();
+        this.throttle = new RequestThrottle(SOURCE_NAME, appProperties.musicbrainz().throttle());
     }
 
     @Override
@@ -139,7 +145,7 @@ public class MusicBrainzMetadataProvider implements MetadataProvider {
 
     private <T> T call(String action, Supplier<T> request) {
         try {
-            return request.get();
+            return throttle.execute(request);
         } catch (RestClientException ex) {
             log.debug("MusicBrainz: {} mislukt", action, ex);
             throw new ExternalLookupException(SOURCE_NAME, "MusicBrainz: " + action + " mislukt: " + ex.getMessage(), ex);
