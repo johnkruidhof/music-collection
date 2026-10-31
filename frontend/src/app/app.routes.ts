@@ -29,6 +29,12 @@ export const routes: Routes = [
     title: 'Release bewerken',
   },
   {
+    path: 'statistieken',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/stats/stats-page').then((m) => m.StatsPage),
+    title: 'Statistieken',
+  },
+  {
     path: 'toevoegen',
     canActivate: [authGuard],
     loadComponent: () => import('./features/add/add-page').then((m) => m.AddPage),

@@ -188,7 +188,7 @@ POST   /api/collection/{id}/cover                eigen cover (multipart `file`, 
 DELETE /api/collection/{id}/cover                                                                ✔
 GET    /api/covers/{coverId}[/thumbnail]         publiek (zonder token), lang cachebaar              ✔
 
-GET    /api/collection/stats                     aantallen per type, per decennium, …
+GET    /api/collection/stats                     aantallen per type, decennium, artiest, staat + waarde   ✔
 ```
 
 Swagger UI in het dev-profiel: http://localhost:8080/swagger-ui.html
@@ -380,7 +380,11 @@ npm run format                 # Prettier; format:check doet hetzelfde zonder te
   locale `nl` (datums) met Nederlandse paginator-teksten (`DutchPaginatorIntl`).
 
 ### Fase 2 — Uitbreidingen
-- [ ] **F-20** Statistieken (per type, decennium, artiest, totale aankoopwaarde)
+- [x] **F-20** Statistieken (per type, decennium, artiest, totale aankoopwaarde)
+  — `GET /api/collection/stats` (`CollectionStatsRepository`, JPQL-aggregaties per gebruiker; staat
+  gesorteerd op Goldmine-volgorde in de service). `/statistieken`: kerncijfers als tegels, verdelingen
+  als `BarList` (één serie, één kleur). Ook gefixt: na inloggen via een diepe link kwam je op `/` uit
+  (dubbele URL-codering van de OIDC-state en navigatie die door de eerste router-navigatie werd overschreven).
 - [ ] **F-21** Covers lokaal opslaan/cachen i.p.v. hotlinken
 - [ ] **F-22** Import/export (CSV, Discogs collection export importeren)
 - [ ] **F-23** Dubbelen-detectie bij toevoegen ("je hebt deze al")

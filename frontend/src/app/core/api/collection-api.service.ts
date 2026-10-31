@@ -9,6 +9,7 @@ import {
   CollectionQuery,
 } from '../models/collection';
 import { ManualRelease, ReleaseCandidate } from '../models/release';
+import { CollectionStats } from '../models/stats';
 
 /** /api/collection — de eigen collectie. */
 @Injectable({ providedIn: 'root' })
@@ -23,6 +24,10 @@ export class CollectionApiService {
       }
     }
     return this.http.get<CollectionPage>('/api/collection', { params });
+  }
+
+  stats(): Observable<CollectionStats> {
+    return this.http.get<CollectionStats>('/api/collection/stats');
   }
 
   get(id: string): Observable<CollectionItem> {
