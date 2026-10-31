@@ -370,7 +370,10 @@ npm run format                 # Prettier; format:check doet hetzelfde zonder te
   tracks toevoegen/verplaatsen/plakken (`track-parser`), cover in de browser verkleind (`resizeImage`,
   EXIF-oriëntatie) en in de backend als JPEG + thumbnail opgeslagen (V2 `cover_image`, `CoverService`).
   `CollectionFieldsFormComponent` is herbruikbaar voor de detailpagina.
-- [ ] **F-18** Frontend: collectie-overzicht (grid met covers / lijst), filters op type, zoeken, sorteren
+- [x] **F-18** Frontend: collectie-overzicht (grid met covers / lijst), filters op type, zoeken, sorteren
+  — `/collectie?q=&type=&sort=&page=&size=&view=`: alles in de URL (terug vanaf detail komt op dezelfde
+  plek uit), zoeken met 300 ms debounce, weergavevoorkeur in `localStorage`, aparte lege-staat voor
+  "collectie leeg" en "niets gevonden".
 - [ ] **F-19** Frontend: detailpagina met tracklist en eigen velden (staat, locatie, notities)
 
 ### Fase 2 — Uitbreidingen

@@ -1,0 +1,137 @@
+<header class="header">
+  <h1>
+    Mijn collectie
+    @if (page(); as p) {
+      <span class="count">({{ p.totalElements }})</span>
+    }
+  </h1>
+  <a mat-flat-button routerLink="/toevoegen"> <mat-icon>add</mat-icon> Toevoegen </a>
+</header>
+
+<div class="toolbar">
+  <mat-form-field appearance="outline" class="search" subscriptSizing="dynamic">
+    <mat-icon matPrefix>search</mat-icon>
+    <mat-label>Zoek op artiest of titel</mat-label>
+    <input matInput [formControl]="searchControl" type="search" autocomplete="off" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="sort" subscriptSizing="dynamic">
+    <mat-label>Sorteren</mat-label>
+    <mat-select [value]="query().sort" (selectionChange)="setSort($event.value)">
+      @for (option of sortOptions; track option.value) {
+        <mat-option [value]="option.value">{{ option.label }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <mat-button-toggle-group
+    [value]="view()"
+    (change)="setView($event.value)"
+    hideSingleSelectionIndicator
+    aria-label="Weergave"
+  >
+    <mat-button-toggle value="grid" aria-label="Grid met covers"
+      ><mat-icon>grid_view</mat-icon></mat-button-toggle
+    >
+    <mat-button-toggle value="list" aria-label="Lijst"
+      ><mat-icon>view_list</mat-icon></mat-button-toggle
+    >
+  </mat-button-toggle-group>
+</div>
+
+<mat-chip-listbox
+  class="types"
+  aria-label="Filter op type"
+  [value]="query().mediaType"
+  (change)="setMediaType($event.value ?? null)"
+>
+  <mat-chip-option [value]="null" [selected]="!query().mediaType">Alle</mat-chip-option>
+  @for (type of mediaTypes; track type) {
+    <mat-chip-option [value]="type">{{ type | mediaType }}</mat-chip-option>
+  }
+</mat-chip-listbox>
+
+@switch (result().kind) {
+  @case ('loading') {
+    <mat-progress-bar mode="indeterminate" />
+  }
+  @case ('error') {
+    <p class="error">{{ errorText() }}</p>
+  }
+  @case ('done') {
+    @if (page(); as p) {
+      @if (p.content.length === 0) {
+        <div class="empty">
+          @if (unfiltered() && p.page === 0) {
+            <mat-icon>library_music</mat-icon>
+            <p>Je collectie is nog leeg.</p>
+            <a mat-flat-button routerLink="/toevoegen">
+              <mat-icon>qr_code_scanner</mat-icon> Eerste release toevoegen
+            </a>
+          } @else {
+            <p>Niets gevonden met deze filters.</p>
+            <button mat-stroked-button type="button" (click)="clearFilters()">
+              Filters wissen
+            </button>
+          }
+        </div>
+      } @else if (view() === 'grid') {
+        <ul class="grid">
+          @for (item of p.content; track item.id) {
+            <li>
+              <a class="card" [routerLink]="['/collectie', item.id]">
+                <app-cover [url]="item.coverThumbnailUrl" [alt]="item.title" />
+                <span class="title">{{ item.title }}</span>
+                <span class="artist">{{ item.artist }}</span>
+                <span class="meta">
+                  {{ item.mediaType | mediaType
+                  }}{{ item.releaseYear ? ' · ' + item.releaseYear : '' }}
+                </span>
+              </a>
+            </li>
+          }
+        </ul>
+      } @else {
+        <ul class="list">
+          @for (item of p.content; track item.id) {
+            <li>
+              <a class="row" [routerLink]="['/collectie', item.id]">
+                <app-cover class="thumb" [url]="item.coverThumbnailUrl" [alt]="item.title" />
+                <span class="text">
+                  <span class="title">{{ item.title }}</span>
+                  <span class="artist">{{ item.artist }}</span>
+                </span>
+                <span class="meta">
+                  {{ item.mediaType | mediaType
+                  }}{{ item.releaseYear ? ' · ' + item.releaseYear : '' }}
+                  @if (item.formatDetails) {
+                    <span class="format">{{ item.formatDetails }}</span>
+                  }
+                </span>
+                <span class="extra">
+                  @if (item.conditionMedia) {
+                    <span>{{ item.conditionMedia | condition }}</span>
+                  }
+                  @if (item.storageLocation) {
+                    <span><mat-icon inline>place</mat-icon> {{ item.storageLocation }}</span>
+                  }
+                </span>
+              </a>
+            </li>
+          }
+        </ul>
+      }
+
+      @if (p.totalElements > pageSizes[0]) {
+        <mat-paginator
+          [length]="p.totalElements"
+          [pageIndex]="p.page"
+          [pageSize]="query().size"
+          [pageSizeOptions]="pageSizes"
+          (page)="onPage($event)"
+          aria-label="Pagina's"
+        />
+      }
+    }
+  }
+}
