@@ -1,0 +1,44 @@
+{
+  "id": "6a09041b-0f79-3278-88d9-0552dd28d37f",
+  "title": "OK Computer",
+  "status": "Official",
+  "date": "1997-07-01",
+  "country": "US",
+  "barcode": "724385522925",
+  "artist-credit": [
+    { "name": "Radiohead", "joinphrase": "", "artist": { "id": "a74b1b7f-71a5-4011-9441-d0b5e4122711", "name": "Radiohead" } }
+  ],
+  "label-info": [
+    { "catalog-number": "CDP 7243 8 55229 2 5", "label": { "id": "abea2d3e-eabf-4480-ab24-9382dd642c73", "name": "Capitol Records", "label-code": 148 } }
+  ],
+  "cover-art-archive": { "artwork": true, "count": 16, "front": true, "back": true, "darkened": false },
+  "media": [
+    {
+      "position": 1,
+      "format": "CD",
+      "track-count": 2,
+      "tracks": [
+        {
+          "number": "1", "position": 1, "title": "Airbag", "length": 284400,
+          "artist-credit": [ { "name": "Radiohead", "joinphrase": "" } ],
+          "recording": { "id": "4a7fea2e-545b-4c63-bc9a-9943cc3a29d7", "title": "Airbag", "length": 284400 }
+        },
+        {
+          "number": "2", "position": 2, "title": "Paranoid Android", "length": 383493,
+          "artist-credit": [ { "name": "Radiohead", "joinphrase": "" } ]
+        }
+      ]
+    },
+    {
+      "position": 2,
+      "format": "DVD-Video",
+      "track-count": 1,
+      "tracks": [
+        {
+          "number": "1", "position": 1, "title": "Karma Police (live)", "length": null,
+          "artist-credit": [ { "name": "Radiohead", "joinphrase": " feat. " }, { "name": "Thom Yorke", "joinphrase": "" } ]
+        }
+      ]
+    }
+  ]
+}

@@ -328,7 +328,13 @@ npm run format                 # Prettier; format:check doet hetzelfde zonder te
   — `DiscogsApi` + `DiscogsMetadataProvider`, `DiscogsMapper` (o.a. schijfnummer uit positie, duur,
   formaat → `MediaType`), `DiscogsClientConfig` (token, User-Agent, time-outs). 404 → leeg,
   overige fouten → `ExternalLookupException`. Rate limiting/retry/caching volgen in F-12.
-- [ ] **F-11** MusicBrainz + Cover Art Archive client als fallback
+- [x] **F-11** MusicBrainz + Cover Art Archive client als fallback
+  — `MusicBrainzApi` (Lucene-query via `MusicBrainzQuery`; `format` zoekt op exacte namen, dus per
+  `MediaType` een lijst) + `CoverArtArchiveApi` + `MusicBrainzMetadataProvider`, `MusicBrainzMapper`.
+  Kandidaten krijgen een opgebouwde `front-250`-URL (kan 404 geven → placeholder in de frontend);
+  details halen de cover alleen op als `cover-art-archive.front` waar is, met vaste URL's als fallback.
+  RestClient-opbouw gedeeld in `config/HttpClientSupport`. MusicBrainz geeft al snel 503 boven
+  1 req/s → rate limiting in F-12 is echt nodig.
 - [ ] **F-12** Lookup-service met normalisatie, lokale catalogus-check, caching, rate limiting + lookup-controller
 - [ ] **F-13** Collection CRUD-API (alleen eigen items), paginering, filters en zoeken
 - [ ] **F-14** Frontend: scan-flow met camera + batch-modus
