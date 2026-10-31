@@ -5,7 +5,12 @@
       <span class="count">({{ p.totalElements }})</span>
     }
   </h1>
-  <a mat-flat-button routerLink="/toevoegen"> <mat-icon>add</mat-icon> Toevoegen </a>
+  <div class="header-actions">
+    <a mat-button routerLink="/collectie/importeren">
+      <mat-icon>import_export</mat-icon> Importeren / exporteren
+    </a>
+    <a mat-flat-button routerLink="/toevoegen"> <mat-icon>add</mat-icon> Toevoegen </a>
+  </div>
 </header>
 
 <div class="toolbar">

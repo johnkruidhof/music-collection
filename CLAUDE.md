@@ -187,6 +187,9 @@ PUT    /api/collection/{id}/release              handmatige release + tracks wij
 POST   /api/collection/{id}/cover                eigen cover (multipart `file`, alleen MANUAL)          ✔
 DELETE /api/collection/{id}/cover                                                                ✔
 GET    /api/covers/{coverId}[/thumbnail]         publiek (zonder token), lang cachebaar              ✔
+GET    /api/collection/export                    CSV-export van de eigen collectie                     ✔
+POST   /api/collection/import/discogs            Discogs-collectie-CSV importeren (202 + taak)          ✔
+GET    /api/collection/import/{jobId} | /latest  voortgang van een import                            ✔
 
 GET    /api/collection/stats                     aantallen per type, decennium, artiest, staat + waarde   ✔
 ```
@@ -389,7 +392,11 @@ npm run format                 # Prettier; format:check doet hetzelfde zonder te
   — `CoverCacheService`: na import `@Async`, plus `@Scheduled` backfill (`app.covers.*`). Download buiten
   de transactie (`CoverDownloader`, throttled), opgeslagen in `cover_image` zoals eigen uploads; originele
   URL in `release.cover_source_url`, max. 3 pogingen (`cover_cache_attempts`, V3). Uit in tests.
-- [ ] **F-22** Import/export (CSV, Discogs collection export importeren)
+- [x] **F-22** Import/export (CSV, Discogs collection export importeren)
+  — Export: `GET /api/collection/export` (puntkomma, decimale komma, UTF-8 + BOM → Nederlandse Excel).
+  Import: `POST /api/collection/import/discogs` start een `@Async`-taak (`ImportWorker`), voortgang via
+  `GET /api/collection/import/{id}|latest`. Per release wordt alleen het tekort aan exemplaren toegevoegd
+  (opnieuw importeren is veilig). Taken staan in het geheugen (weg na herstart). Eigen-formaat-import nog niet.
 - [ ] **F-23** Dubbelen-detectie bij toevoegen ("je hebt deze al")
 - [ ] **F-24** Wishlist naast collectie
 - [ ] **F-26** PWA: installeerbaar op telefoon, offline collectie bekijken
