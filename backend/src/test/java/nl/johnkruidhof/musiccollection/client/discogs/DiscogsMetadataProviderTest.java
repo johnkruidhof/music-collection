@@ -54,7 +54,7 @@ class DiscogsMetadataProviderTest {
     private static DiscogsMetadataProvider provider(AppProperties.Throttle throttle) {
         AppProperties.Discogs properties = new AppProperties.Discogs(discogs.baseUrl(), TOKEN, USER_AGENT, throttle);
         DiscogsApi api = DiscogsClientConfig.createDiscogsApi(RestClient.builder(), properties);
-        return new DiscogsMetadataProvider(api, new DiscogsMapperImpl(), new AppProperties(null, properties, null, null));
+        return new DiscogsMetadataProvider(api, new DiscogsMapperImpl(), new AppProperties(null, properties, null, null, null));
     }
 
     @Test

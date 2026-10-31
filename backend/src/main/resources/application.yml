@@ -88,3 +88,6 @@ app:
     min-interval: 500ms
     backfill-initial-delay: PT1M
     backfill-interval: PT10M
+  audd:
+    base-url: https://api.audd.io
+    api-token: ${AUDD_API_TOKEN:}

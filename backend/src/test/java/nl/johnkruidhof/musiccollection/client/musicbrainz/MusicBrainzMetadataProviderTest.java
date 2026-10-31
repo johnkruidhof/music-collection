@@ -56,7 +56,7 @@ class MusicBrainzMetadataProviderTest {
                 MusicBrainzClientConfig.createMusicBrainzApi(RestClient.builder(), properties),
                 MusicBrainzClientConfig.createCoverArtArchiveApi(RestClient.builder(), properties),
                 new MusicBrainzMapperImpl(),
-                new AppProperties(null, null, properties, null));
+                new AppProperties(null, null, properties, null, null));
     }
 
     @Test

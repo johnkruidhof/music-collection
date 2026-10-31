@@ -68,6 +68,7 @@ services:
       OIDC_ISSUER_URI: https://${APP_HOST:-localhost}/auth/realms/music
       OIDC_JWK_SET_URI: http://keycloak:8080/auth/realms/music/protocol/openid-connect/certs
       DISCOGS_TOKEN: ${DISCOGS_TOKEN:-}
+      AUDD_API_TOKEN: ${AUDD_API_TOKEN:-}
     depends_on:
       postgres:
         condition: service_healthy

@@ -10,10 +10,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * Waarden komen uit application.yml en kunnen overschreven worden met env-vars.
  */
 @ConfigurationProperties(prefix = "app")
-public record AppProperties(Cors cors, Discogs discogs, MusicBrainz musicbrainz, Covers covers) {
+public record AppProperties(Cors cors, Discogs discogs, MusicBrainz musicbrainz, Covers covers, Audd audd) {
 
     public AppProperties {
         covers = covers == null ? Covers.DEFAULT : covers;
+        audd = audd == null ? new Audd(null, null) : audd;
     }
 
     public record Cors(List<String> allowedOrigins) {
@@ -54,6 +55,20 @@ public record AppProperties(Cors cors, Discogs discogs, MusicBrainz musicbrainz,
             retryBackoff = retryBackoff == null ? Duration.ofSeconds(1) : retryBackoff;
             maxWait = maxWait == null ? Duration.ofSeconds(20) : maxWait;
             maxRetries = Math.max(0, maxRetries);
+        }
+    }
+
+    /**
+     * AudD-muziekherkenning (F-30) — https://docs.audd.io. Zonder {@code apiToken} staat luisteren uit.
+     */
+    public record Audd(String baseUrl, String apiToken) {
+
+        public Audd {
+            baseUrl = baseUrl == null || baseUrl.isBlank() ? "https://api.audd.io" : baseUrl;
+        }
+
+        public boolean enabled() {
+            return apiToken != null && !apiToken.isBlank();
         }
     }
 
