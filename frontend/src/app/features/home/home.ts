@@ -44,9 +44,18 @@ import { UserApiService } from '../../core/api/user-api.service';
     }
   `,
   styles: `
-    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
-    .intro { max-width: 640px; }
-    .error { color: var(--mat-sys-error); }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .intro {
+      max-width: 640px;
+    }
+    .error {
+      color: var(--mat-sys-error);
+    }
   `,
 })
 export class Home {

@@ -6,8 +6,8 @@ import { AuthService } from './core/auth/auth.service';
 class AuthServiceStub {
   isLoggedIn = () => false;
   displayName = () => null;
-  login() {}
-  logout() {}
+  login = () => undefined;
+  logout = () => undefined;
 }
 
 describe('App', () => {

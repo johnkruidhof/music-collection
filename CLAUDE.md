@@ -272,6 +272,8 @@ npm install
 npm start                      # ng serve met proxy naar :8080
 npm run build
 npx ng test --watch=false
+npm run lint                   # ESLint (angular-eslint)
+npm run format                 # Prettier; format:check doet hetzelfde zonder te schrijven (CI)
 ```
 
 ---
@@ -311,7 +313,9 @@ npx ng test --watch=false
 - [x] **F-0a** Maven Wrapper toevoegen (`mvn wrapper:wrapper`) en Dockerfile/CI/README op `./mvnw` zetten
   — wrapper 3.3.4 (only-script) met Maven 3.9.16; Dockerfile bouwt op `eclipse-temurin:25-jdk`;
   `.gitattributes` houdt `mvnw` op LF.
-- [ ] **F-0b** ESLint (`ng add angular-eslint`) + Prettier-config en `npm run lint` in CI
+- [x] **F-0b** ESLint (`ng add angular-eslint`) + Prettier-config en `npm run lint` in CI
+  — `eslint-config-prettier` zet botsende regels uit; CI draait `lint` en `format:check`.
+  Angular CLI 22.2 vereist Node ≥ 24.15.
 
 ### Fase 1 — MVP collectiebeheer
 - [ ] **F-10** Discogs-client (barcode + zoeken + release-details), WireMock-tests

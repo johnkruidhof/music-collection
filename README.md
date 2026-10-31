@@ -53,4 +53,5 @@ cd frontend && npm install && npm start      # http://localhost:4200
 ```
 
 - Swagger UI (dev): http://localhost:8080/swagger-ui.html
+- Frontend: `npm run lint` (ESLint) en `npm run format` (Prettier); Node ≥ 24.15 vereist.
 - `./mvnw verify` draait ook integratietests met Testcontainers en heeft dus een draaiende Docker nodig.
