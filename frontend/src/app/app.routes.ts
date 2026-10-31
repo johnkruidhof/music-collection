@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { adminGuard } from './core/auth/admin.guard';
 import { authGuard } from './core/auth/auth.guard';
 
 export const routes: Routes = [
@@ -34,6 +35,12 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/add/manual/manual-release-page').then((m) => m.ManualReleasePage),
     title: 'Release bewerken',
+  },
+  {
+    path: 'beheer',
+    canActivate: [authGuard, adminGuard],
+    loadComponent: () => import('./features/admin/admin-page').then((m) => m.AdminPage),
+    title: 'Catalogusbeheer',
   },
   {
     path: 'verlanglijst',

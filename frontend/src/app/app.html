@@ -15,6 +15,11 @@
       <a mat-button routerLink="/statistieken" routerLinkActive="active">
         <mat-icon>insights</mat-icon><span class="label">Statistieken</span>
       </a>
+      @if (currentUser.isAdmin()) {
+        <a mat-button routerLink="/beheer" routerLinkActive="active">
+          <mat-icon>admin_panel_settings</mat-icon><span class="label">Beheer</span>
+        </a>
+      }
       <a mat-button routerLink="/toevoegen" routerLinkActive="active">
         <mat-icon>qr_code_scanner</mat-icon><span class="label">Toevoegen</span>
       </a>

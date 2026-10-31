@@ -196,6 +196,10 @@ GET    /api/wishlist                             verlanglijst                   
 POST   /api/wishlist                             { source, externalId, notes } (idempotent)            ✔
 DELETE /api/wishlist/{id}                                                                        ✔
 POST   /api/wishlist/{id}/acquire                gekocht → collectie-item (body: eigen velden, optioneel)  ✔
+GET    /api/admin/releases?q=&source=&page=&size=   catalogus + gebruik (rol admin)                     ✔
+DELETE /api/admin/releases/{id}                  alleen ongebruikte release (rol admin)                ✔
+DELETE /api/admin/releases/unused                alle ongebruikte releases opruimen (rol admin)        ✔
+POST   /api/admin/releases/{id}/merge            { targetId }: samenvoegen (rol admin)                 ✔
 GET    /api/collection/stats                     aantallen per type, decennium, artiest, staat + waarde   ✔
 ```
 
@@ -418,7 +422,10 @@ npm run format                 # Prettier; format:check doet hetzelfde zonder te
   Tokens in `localStorage`; offline met eerdere sessie → `AuthService.offlineSession` (guard laat door,
   "Offline"-chip). Uitloggen wist de API-caches. nginx: `ngsw-worker.js`/`ngsw.json` `no-cache`.
   Service worker vereist een vertrouwd certificaat (Caddy-root installeren).
-- [ ] **F-27** Admin-scherm: catalogus opschonen, releases samenvoegen
+- [x] **F-27** Admin-scherm: catalogus opschonen, releases samenvoegen
+  — `/api/admin/releases` (rol `admin`): zoeken met gebruik per release, ongebruikte verwijderen/opruimen,
+  samenvoegen (items + wensen verhuizen, dubbele wens vervalt, bron weg). Frontend `/beheer` met
+  `adminGuard` (rollen uit `/api/me` via `CurrentUserService`); menu-item alleen voor admins.
 
 ### Fase 3 — Audio-herkenning ("luisteren")
 - [ ] **F-30** Onderzoek & proof of concept audioherkenning
