@@ -10,10 +10,6 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMoc
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UncheckedIOException;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +20,7 @@ import org.springframework.web.client.RestClient;
 
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 
+import nl.johnkruidhof.musiccollection.TestFixtures;
 import nl.johnkruidhof.musiccollection.config.AppProperties;
 import nl.johnkruidhof.musiccollection.config.DiscogsClientConfig;
 import nl.johnkruidhof.musiccollection.dto.lookup.ReleaseCandidateDto;
@@ -190,13 +187,6 @@ class DiscogsMetadataProviderTest {
     }
 
     private static String fixture(String name) {
-        try (InputStream in = DiscogsMetadataProviderTest.class.getResourceAsStream("/discogs/" + name)) {
-            if (in == null) {
-                throw new IllegalArgumentException("Fixture niet gevonden: " + name);
-            }
-            return new String(in.readAllBytes(), StandardCharsets.UTF_8);
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
-        }
+        return TestFixtures.read("discogs/" + name);
     }
 }

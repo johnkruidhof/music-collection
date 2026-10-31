@@ -1,0 +1,36 @@
+{
+  "created": "2026-10-31T17:00:00.000Z",
+  "count": 2,
+  "offset": 0,
+  "releases": [
+    {
+      "id": "6a09041b-0f79-3278-88d9-0552dd28d37f",
+      "score": 100,
+      "title": "OK Computer",
+      "status": "Official",
+      "artist-credit": [
+        { "name": "Radiohead", "artist": { "id": "a74b1b7f-71a5-4011-9441-d0b5e4122711", "name": "Radiohead" } }
+      ],
+      "release-group": { "id": "b1392450-e666-3926-a536-22c65f834433", "primary-type": "Album" },
+      "date": "1997-07-01",
+      "country": "US",
+      "barcode": "724385522925",
+      "label-info": [
+        { "catalog-number": "CDP 7243 8 55229 2 5", "label": { "id": "abea2d3e-eabf-4480-ab24-9382dd642c73", "name": "Capitol Records" } }
+      ],
+      "track-count": 12,
+      "media": [ { "format": "CD", "disc-count": 16, "track-count": 12 } ]
+    },
+    {
+      "id": "0b6b4ba0-d36f-47bd-b4ea-6a5b91842d29",
+      "score": 90,
+      "title": "OK Computer",
+      "artist-credit": [ { "name": "Radiohead" } ],
+      "date": "",
+      "country": "XE",
+      "barcode": "",
+      "label-info": [ { "catalog-number": "[none]", "label": { "name": "Parlophone" } } ],
+      "media": [ { "format": "12\" Vinyl" }, { "format": "12\" Vinyl" } ]
+    }
+  ]
+}
