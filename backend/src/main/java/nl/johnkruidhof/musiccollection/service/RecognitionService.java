@@ -1,9 +1,13 @@
 package nl.johnkruidhof.musiccollection.service;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
@@ -17,6 +21,8 @@ import nl.johnkruidhof.musiccollection.dto.lookup.ReleaseCandidateDto;
 import nl.johnkruidhof.musiccollection.dto.lookup.ReleaseSearchCriteria;
 import nl.johnkruidhof.musiccollection.dto.recognition.RecognitionResultDto;
 import nl.johnkruidhof.musiccollection.dto.recognition.RecognizedTrackDto;
+import nl.johnkruidhof.musiccollection.dto.recognition.TrackMatchDto;
+import nl.johnkruidhof.musiccollection.entity.CollectionItem;
 import nl.johnkruidhof.musiccollection.exception.ExternalLookupException;
 import nl.johnkruidhof.musiccollection.exception.InvalidRequestException;
 import nl.johnkruidhof.musiccollection.exception.RecognitionUnavailableException;
@@ -46,8 +52,13 @@ public class RecognitionService {
         return audioRecognizer.enabled();
     }
 
-    /** Herkennen gebeurt buiten een transactie (externe aanroep van enkele seconden). */
-    public RecognitionResultDto recognize(Jwt jwt, byte[] audio, String fileName) {
+    /**
+     * Herkennen gebeurt buiten een transactie (externe aanroep van enkele seconden).
+     *
+     * @param collectionOnly "Welke van mijn platen is dit?" (F-32): alleen de eigen collectie, geen zoekactie
+     *                       bij Discogs/MusicBrainz
+     */
+    public RecognitionResultDto recognize(Jwt jwt, byte[] audio, String fileName, boolean collectionOnly) {
         if (!audioRecognizer.enabled()) {
             throw new RecognitionUnavailableException();
         }
@@ -63,16 +74,36 @@ public class RecognitionService {
         }
         RecognizedTrackDto track = recognized.get();
         log.debug("Herkend: {} - {} ({})", track.artist(), track.title(), track.album());
-        return new RecognitionResultDto(track, inCollection(jwt, track), candidates(jwt, track));
+        OwnMatches own = inCollection(jwt, track);
+        return new RecognitionResultDto(track, own.items(), own.tracks(),
+                collectionOnly ? List.of() : candidates(jwt, track));
     }
 
-    private List<CollectionItemSummaryDto> inCollection(Jwt jwt, RecognizedTrackDto track) {
+    private record OwnMatches(List<CollectionItemSummaryDto> items, List<TrackMatchDto> tracks) {
+    }
+
+    /** Eigen items, met items waarop het nummer echt als track staat vooraan. */
+    private OwnMatches inCollection(Jwt jwt, RecognizedTrackDto track) {
+        String title = baseTitle(track.title()).toLowerCase(Locale.ROOT);
         return transactionTemplate.execute(status -> {
             UUID userId = userService.getOrCreate(jwt).getId();
-            return collectionItemRepository.findByRecognizedTrack(userId, contains(mainArtist(track.artist())),
-                            contains(baseTitle(track.title())),
-                            isBlank(track.album()) ? NO_MATCH : contains(baseTitle(track.album())))
-                    .stream().map(collectionItemMapper::toSummary).toList();
+            List<CollectionItem> items = collectionItemRepository.findByRecognizedTrack(userId,
+                    contains(mainArtist(track.artist())), contains(baseTitle(track.title())),
+                    isBlank(track.album()) ? NO_MATCH : contains(baseTitle(track.album())));
+            List<TrackMatchDto> tracks = new ArrayList<>();
+            for (CollectionItem item : items) {
+                item.getRelease().getTracks().stream()
+                        .filter(t -> t.getTitle().toLowerCase(Locale.ROOT).contains(title))
+                        .findFirst()
+                        .ifPresent(t -> tracks.add(new TrackMatchDto(item.getId(), t.getDiscNumber(), t.getPosition(),
+                                t.getTitle())));
+            }
+            Set<UUID> withTrack = tracks.stream().map(TrackMatchDto::itemId).collect(Collectors.toSet());
+            List<CollectionItemSummaryDto> summaries = items.stream()
+                    .sorted(Comparator.comparing((CollectionItem i) -> !withTrack.contains(i.getId())))
+                    .map(collectionItemMapper::toSummary)
+                    .toList();
+            return new OwnMatches(summaries, tracks);
         });
     }
 

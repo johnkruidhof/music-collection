@@ -27,7 +27,7 @@ public class AuddClientConfig {
         RestClient.Builder builder = HttpClientSupport.restClient(restClientBuilder, appProperties.audd().baseUrl(),
                 appProperties.musicbrainz().userAgent());
         JdkClientHttpRequestFactory requestFactory = new JdkClientHttpRequestFactory(
-                // HTTP/1.1: een h2c-upgrade op een POST met (grote) body wordt door sommige servers afgebroken.
+                // HTTP/1.1, zoals in HttpClientSupport (geen h2c-upgrade op een POST met body).
                 java.net.http.HttpClient.newBuilder().version(java.net.http.HttpClient.Version.HTTP_1_1)
                         .connectTimeout(Duration.ofSeconds(5)).build());
         requestFactory.setReadTimeout(Duration.ofSeconds(30));

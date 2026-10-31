@@ -20,7 +20,10 @@ final class HttpClientSupport {
 
     /** RestClient-builder met (optioneel) base-URL, User-Agent en time-outs; volgt redirects (Cover Art Archive). */
     static RestClient.Builder restClient(RestClient.Builder builder, String baseUrl, String userAgent) {
+        // HTTP/1.1: geen h2c-upgradepoging op plain HTTP (die breekt bij sommige servers, o.a. WireMock in
+        // tests); externe HTTPS-diensten werken hier zonder verschil mee.
         HttpClient httpClient = HttpClient.newBuilder()
+                .version(HttpClient.Version.HTTP_1_1)
                 .connectTimeout(CONNECT_TIMEOUT)
                 .followRedirects(HttpClient.Redirect.NORMAL)
                 .build();

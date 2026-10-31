@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
-import { RecognitionResult } from '../models/recognition';
+import { RecognitionResult, RecognitionScope } from '../models/recognition';
 
 /** /api/recognize — muziek herkennen uit een opname (F-30/F-31). */
 @Injectable({ providedIn: 'root' })
@@ -12,9 +12,13 @@ export class RecognitionApiService {
     return this.http.get<{ enabled: boolean }>('/api/recognize/status').pipe(map((s) => s.enabled));
   }
 
-  recognize(audio: Blob, fileName: string): Observable<RecognitionResult> {
+  recognize(
+    audio: Blob,
+    fileName: string,
+    scope: RecognitionScope = 'all',
+  ): Observable<RecognitionResult> {
     const form = new FormData();
     form.append('file', audio, fileName);
-    return this.http.post<RecognitionResult>('/api/recognize', form);
+    return this.http.post<RecognitionResult>('/api/recognize', form, { params: { scope } });
   }
 }

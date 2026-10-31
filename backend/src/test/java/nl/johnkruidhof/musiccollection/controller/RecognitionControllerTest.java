@@ -52,11 +52,11 @@ class RecognitionControllerTest {
 
     @Test
     void recognizeReturnsTrack() throws Exception {
-        given(recognitionService.recognize(any(), any(), eq("opname.webm"))).willReturn(new RecognitionResultDto(
+        given(recognitionService.recognize(any(), any(), eq("opname.webm"), eq(true))).willReturn(new RecognitionResultDto(
                 new RecognizedTrackDto("Radiohead", "Karma Police", "OK Computer", 1997, null, null), List.of(),
-                List.of()));
+                List.of(), List.of()));
 
-        mockMvc.perform(multipart("/api/recognize").with(jwt())
+        mockMvc.perform(multipart("/api/recognize").with(jwt()).param("scope", "collection")
                         .file(new MockMultipartFile("file", "opname.webm", "audio/webm", new byte[] {1, 2})))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.track.title").value("Karma Police"));
@@ -64,7 +64,7 @@ class RecognitionControllerTest {
 
     @Test
     void notConfiguredGives503() throws Exception {
-        given(recognitionService.recognize(any(), any(), any())).willThrow(new RecognitionUnavailableException());
+        given(recognitionService.recognize(any(), any(), any(), org.mockito.ArgumentMatchers.anyBoolean())).willThrow(new RecognitionUnavailableException());
 
         mockMvc.perform(multipart("/api/recognize").with(jwt())
                         .file(new MockMultipartFile("file", "opname.webm", "audio/webm", new byte[] {1})))

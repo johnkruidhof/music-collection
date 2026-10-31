@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { ActivatedRoute, provideRouter } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { of, throwError } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -34,6 +34,7 @@ const result: RecognitionResult = {
       addedAt: '2026-10-31T12:00:00Z',
     },
   ],
+  trackMatches: [{ itemId: 'item-1', discNumber: 1, position: 'B1', title: 'Karma Police' }],
   candidates: [],
 };
 
@@ -47,12 +48,23 @@ describe('ListenPage', () => {
     })),
   };
 
+  let routeData: Record<string, unknown> = {};
+
   beforeEach(async () => {
     vi.clearAllMocks();
+    routeData = {};
     await TestBed.configureTestingModule({
       imports: [ListenPage],
       providers: [
         provideRouter([]),
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            get snapshot() {
+              return { data: routeData };
+            },
+          },
+        },
         { provide: RecognitionApiService, useValue: recognitionApi },
         { provide: AudioRecorderService, useValue: recorder },
         { provide: CollectionApiService, useValue: { addCandidate: vi.fn() } },
@@ -69,16 +81,48 @@ describe('ListenPage', () => {
     const el = fixture.nativeElement as HTMLElement;
 
     expect(recorder.record).toHaveBeenCalledWith(10_000, expect.any(Function));
-    expect(recognitionApi.recognize).toHaveBeenCalledWith(expect.any(Blob), 'opname.webm');
+    expect(recognitionApi.recognize).toHaveBeenCalledWith(expect.any(Blob), 'opname.webm', 'all');
     expect(el.querySelector('.track-title')?.textContent).toContain('Karma Police');
     expect(el.textContent).toContain('Staat al in je collectie');
     expect(el.querySelector('.owned a')?.getAttribute('href')).toBe('/collectie/item-1');
     expect(el.textContent).toContain('Kast A');
   });
 
+  it('zoekt in collectiemodus alleen in de eigen collectie en toont track en locatie', async () => {
+    routeData = { mode: 'collection' };
+    const fixture = TestBed.createComponent(ListenPage);
+    await fixture.componentInstance.listen();
+    await fixture.whenStable();
+    const el = fixture.nativeElement as HTMLElement;
+
+    expect(recognitionApi.recognize).toHaveBeenCalledWith(
+      expect.any(Blob),
+      'opname.webm',
+      'collection',
+    );
+    expect(el.querySelector('h1')?.textContent).toContain('Welke van mijn platen is dit?');
+    expect(el.querySelector('.match')?.textContent).toContain('B1 · Karma Police');
+    expect(el.querySelector('.location')?.textContent).toContain('Kast A');
+    expect(el.textContent).not.toContain('Releases met dit nummer');
+  });
+
+  it('meldt in collectiemodus als het nummer niet in de collectie staat', async () => {
+    routeData = { mode: 'collection' };
+    recognitionApi.recognize.mockReturnValueOnce(
+      of({ ...result, inCollection: [], trackMatches: [] }),
+    );
+    const fixture = TestBed.createComponent(ListenPage);
+    await fixture.componentInstance.listen();
+    await fixture.whenStable();
+
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain(
+      'staat (nog) niet in je collectie',
+    );
+  });
+
   it('meldt als niets herkend is', async () => {
     recognitionApi.recognize.mockReturnValueOnce(
-      of({ track: null, inCollection: [], candidates: [] }),
+      of({ track: null, inCollection: [], trackMatches: [], candidates: [] }),
     );
     const fixture = TestBed.createComponent(ListenPage);
 
