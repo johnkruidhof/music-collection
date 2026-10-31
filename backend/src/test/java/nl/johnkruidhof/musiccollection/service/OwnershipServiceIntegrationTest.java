@@ -12,10 +12,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import nl.johnkruidhof.musiccollection.TestDatabase;
 import nl.johnkruidhof.musiccollection.TestcontainersConfiguration;
 import nl.johnkruidhof.musiccollection.dto.collection.AddToCollectionRequest;
 import nl.johnkruidhof.musiccollection.dto.lookup.ReleaseCandidateDto;
@@ -54,14 +56,15 @@ class OwnershipServiceIntegrationTest {
     @Autowired
     private AppUserRepository userRepository;
 
+    @Autowired
+    private JdbcTemplate jdbc;
+
     @MockitoBean
     private ExternalLookupService externalLookupService;
 
     @BeforeEach
     void setUp() {
-        collectionItemRepository.deleteAll();
-        releaseRepository.deleteAll();
-        userRepository.deleteAll();
+        TestDatabase.clean(jdbc);
         given(externalLookupService.getDetails(MetadataSource.DISCOGS, "1")).willReturn(Optional.of(release(
                 MetadataSource.DISCOGS, "1", null)));
         given(externalLookupService.getDetails(MetadataSource.MUSICBRAINZ, MBID)).willReturn(Optional.of(release(
@@ -97,7 +100,7 @@ class OwnershipServiceIntegrationTest {
 
     private static ReleaseCandidateDto candidate(MetadataSource source, String externalId) {
         return new ReleaseCandidateDto(source, externalId, "Radiohead", "OK Computer", 1997, MediaType.CD, null, null,
-                null, null, null, null, null);
+                null, null, null, null, null, null);
     }
 
     private static ReleaseDto release(MetadataSource source, String discogsId, String musicbrainzId) {

@@ -6,8 +6,8 @@ import nl.johnkruidhof.musiccollection.entity.MetadataSource;
 /**
  * Een zoekresultaat van een externe bron (of de lokale catalogus) waaruit de gebruiker kiest.
  * Bevat nog geen tracks; die worden pas opgehaald bij {@code GET /api/lookup/{source}/{externalId}}.
- * {@code ownedCount} (F-23) is persoonlijk: hoeveel exemplaren de gebruiker al heeft; {@code null} in de
- * (gedeelde) cache, ingevuld door de lookup-service.
+ * {@code ownedCount} (F-23) en {@code onWishlist} (F-24) zijn persoonlijk; {@code null} in de (gedeelde)
+ * cache, ingevuld door de lookup-service.
  */
 public record ReleaseCandidateDto(
         MetadataSource source,
@@ -22,5 +22,6 @@ public record ReleaseCandidateDto(
         String country,
         String barcode,
         String coverThumbnailUrl,
-        Integer ownedCount) {
+        Integer ownedCount,
+        Boolean onWishlist) {
 }

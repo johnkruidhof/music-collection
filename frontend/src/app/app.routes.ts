@@ -36,6 +36,12 @@ export const routes: Routes = [
     title: 'Release bewerken',
   },
   {
+    path: 'verlanglijst',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/wishlist/wishlist-page').then((m) => m.WishlistPage),
+    title: 'Verlanglijst',
+  },
+  {
     path: 'statistieken',
     canActivate: [authGuard],
     loadComponent: () => import('./features/stats/stats-page').then((m) => m.StatsPage),

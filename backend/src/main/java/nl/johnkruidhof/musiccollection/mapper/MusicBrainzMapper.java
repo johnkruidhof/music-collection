@@ -38,6 +38,7 @@ public abstract class MusicBrainzMapper {
     @Mapping(target = "barcode", source = "barcode", qualifiedByName = "blankToNull")
     @Mapping(target = "coverThumbnailUrl", source = "id", qualifiedByName = "frontThumbnailUrl")
     @Mapping(target = "ownedCount", ignore = true)
+    @Mapping(target = "onWishlist", ignore = true)
     public abstract ReleaseCandidateDto toCandidate(MusicBrainzRelease release, @Context String coverArtBaseUrl);
 
     public abstract List<ReleaseCandidateDto> toCandidates(List<MusicBrainzRelease> releases,

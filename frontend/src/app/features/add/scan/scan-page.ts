@@ -11,6 +11,7 @@ import { CollectionApiService } from '../../../core/api/collection-api.service';
 import { LookupApiService } from '../../../core/api/lookup-api.service';
 import { ReleaseCandidate } from '../../../core/models/release';
 import { CandidateCard } from '../../../shared/candidate-card';
+import { WishlistActions } from '../../../shared/wishlist-actions';
 import { errorMessage } from '../../../shared/http-error';
 import { scanFeedback } from '../../../shared/scan-feedback';
 import { BarcodeScanner } from './barcode-scanner';
@@ -28,6 +29,7 @@ export type ScanState =
  */
 @Component({
   selector: 'app-scan-page',
+  providers: [WishlistActions],
   imports: [
     BarcodeScanner,
     CandidateCard,
@@ -87,6 +89,10 @@ export type ScanState =
               @for (candidate of candidates(); track candidate.source + candidate.externalId) {
                 <app-candidate-card
                   [candidate]="candidate"
+                  [wishable]="true"
+                  [wishBusy]="wishlist.isBusy(candidate)"
+                  [wishedLocally]="wishlist.isWished(candidate)"
+                  (wish)="wishlist.add($event)"
                   [busy]="adding() === candidate"
                   (add)="add($event)"
                 />
@@ -176,6 +182,7 @@ export type ScanState =
   `,
 })
 export class ScanPage {
+  protected readonly wishlist = inject(WishlistActions);
   private readonly lookupApi = inject(LookupApiService);
   private readonly collectionApi = inject(CollectionApiService);
   private readonly snackBar = inject(MatSnackBar);

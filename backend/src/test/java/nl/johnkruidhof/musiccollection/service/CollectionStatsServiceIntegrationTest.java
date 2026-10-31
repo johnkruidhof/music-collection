@@ -12,10 +12,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import nl.johnkruidhof.musiccollection.TestDatabase;
 import nl.johnkruidhof.musiccollection.TestcontainersConfiguration;
 import nl.johnkruidhof.musiccollection.dto.collection.AddToCollectionRequest;
 import nl.johnkruidhof.musiccollection.dto.collection.CollectionItemFields;
@@ -50,14 +52,15 @@ class CollectionStatsServiceIntegrationTest {
     @Autowired
     private AppUserRepository userRepository;
 
+    @Autowired
+    private JdbcTemplate jdbc;
+
     @MockitoBean
     private ExternalLookupService externalLookupService;
 
     @BeforeEach
     void cleanDatabase() {
-        collectionItemRepository.deleteAll();
-        releaseRepository.deleteAll();
-        userRepository.deleteAll();
+        TestDatabase.clean(jdbc);
     }
 
     @Test
