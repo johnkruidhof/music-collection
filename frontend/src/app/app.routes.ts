@@ -72,6 +72,11 @@ export const routes: Routes = [
         title: 'Zoeken',
       },
       {
+        path: 'luisteren',
+        loadComponent: () => import('./features/add/listen/listen-page').then((m) => m.ListenPage),
+        title: 'Luisteren',
+      },
+      {
         path: 'handmatig',
         loadComponent: () =>
           import('./features/add/manual/manual-release-page').then((m) => m.ManualReleasePage),
