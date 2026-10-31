@@ -2,6 +2,8 @@ package nl.johnkruidhof.musiccollection.controller;
 
 import java.util.List;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,14 +26,15 @@ public class LookupController {
 
     /** Kandidaten uit de lokale catalogus, anders uit Discogs/MusicBrainz; leeg = niets gevonden. */
     @GetMapping("/barcode/{barcode}")
-    public List<ReleaseCandidateDto> byBarcode(@PathVariable String barcode) {
-        return lookupService.lookupBarcode(barcode);
+    public List<ReleaseCandidateDto> byBarcode(@AuthenticationPrincipal Jwt jwt, @PathVariable String barcode) {
+        return lookupService.lookupBarcode(jwt, barcode);
     }
 
     /** {@code ?artist=&title=&year=&mediaType=}; minstens artiest of titel. */
     @GetMapping("/search")
-    public List<ReleaseCandidateDto> search(@Valid @ModelAttribute ReleaseSearchCriteria criteria) {
-        return lookupService.search(criteria);
+    public List<ReleaseCandidateDto> search(@AuthenticationPrincipal Jwt jwt,
+            @Valid @ModelAttribute ReleaseSearchCriteria criteria) {
+        return lookupService.search(jwt, criteria);
     }
 
     /** Volledige gegevens inclusief tracks; {@code source} is {@code discogs} of {@code musicbrainz}. */

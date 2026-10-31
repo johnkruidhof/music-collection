@@ -47,6 +47,7 @@ public abstract class DiscogsMapper {
     @Mapping(target = "country", source = "country", qualifiedByName = "blankToNull")
     @Mapping(target = "barcode", source = "barcode", qualifiedByName = "firstBarcode")
     @Mapping(target = "coverThumbnailUrl", source = "thumb", qualifiedByName = "imageUrl")
+    @Mapping(target = "ownedCount", ignore = true)
     public abstract ReleaseCandidateDto toCandidate(DiscogsSearchResult result);
 
     public abstract List<ReleaseCandidateDto> toCandidates(List<DiscogsSearchResult> results);

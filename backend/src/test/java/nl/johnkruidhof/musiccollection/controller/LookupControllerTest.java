@@ -1,5 +1,7 @@
 package nl.johnkruidhof.musiccollection.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -47,20 +49,21 @@ class LookupControllerTest {
 
     @Test
     void barcodeLookupReturnsCandidates() throws Exception {
-        given(lookupService.lookupBarcode("724385522925")).willReturn(List.of(new ReleaseCandidateDto(
+        given(lookupService.lookupBarcode(any(), eq("724385522925"))).willReturn(List.of(new ReleaseCandidateDto(
                 MetadataSource.DISCOGS, "2149389", "Radiohead", "OK Computer", 1997, MediaType.VINYL,
-                "Vinyl, LP, Album", "Parlophone", "NODATA 02", "UK", "724385522925", "https://img/thumb.jpg")));
+                "Vinyl, LP, Album", "Parlophone", "NODATA 02", "UK", "724385522925", "https://img/thumb.jpg", 2)));
 
         mockMvc.perform(get("/api/lookup/barcode/724385522925").with(jwt()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].source").value("DISCOGS"))
                 .andExpect(jsonPath("$[0].externalId").value("2149389"))
-                .andExpect(jsonPath("$[0].mediaType").value("VINYL"));
+                .andExpect(jsonPath("$[0].mediaType").value("VINYL"))
+                .andExpect(jsonPath("$[0].ownedCount").value(2));
     }
 
     @Test
     void invalidBarcodeGivesProblemDetail() throws Exception {
-        given(lookupService.lookupBarcode("abc")).willThrow(new InvalidRequestException("Ongeldige barcode"));
+        given(lookupService.lookupBarcode(any(), eq("abc"))).willThrow(new InvalidRequestException("Ongeldige barcode"));
 
         mockMvc.perform(get("/api/lookup/barcode/abc").with(jwt()))
                 .andExpect(status().isBadRequest())
@@ -69,7 +72,7 @@ class LookupControllerTest {
 
     @Test
     void searchBindsQueryParameters() throws Exception {
-        given(lookupService.search(new ReleaseSearchCriteria("Radiohead", "OK Computer", 1997, MediaType.CD)))
+        given(lookupService.search(any(), eq(new ReleaseSearchCriteria("Radiohead", "OK Computer", 1997, MediaType.CD))))
                 .willReturn(List.of());
 
         mockMvc.perform(get("/api/lookup/search").with(jwt())
@@ -77,7 +80,7 @@ class LookupControllerTest {
                         .param("year", "1997").param("mediaType", "CD"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());
-        verify(lookupService).search(new ReleaseSearchCriteria("Radiohead", "OK Computer", 1997, MediaType.CD));
+        verify(lookupService).search(any(), eq(new ReleaseSearchCriteria("Radiohead", "OK Computer", 1997, MediaType.CD)));
     }
 
     @Test

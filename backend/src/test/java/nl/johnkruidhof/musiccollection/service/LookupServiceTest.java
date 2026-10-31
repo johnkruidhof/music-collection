@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -12,12 +13,16 @@ import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 import nl.johnkruidhof.musiccollection.dto.lookup.ReleaseCandidateDto;
 import nl.johnkruidhof.musiccollection.dto.lookup.ReleaseSearchCriteria;
 import nl.johnkruidhof.musiccollection.dto.release.ReleaseDto;
+import nl.johnkruidhof.musiccollection.entity.AppUser;
 import nl.johnkruidhof.musiccollection.entity.MediaType;
 import nl.johnkruidhof.musiccollection.entity.MetadataSource;
 import nl.johnkruidhof.musiccollection.entity.Release;
@@ -29,17 +34,31 @@ import nl.johnkruidhof.musiccollection.repository.ReleaseRepository;
 
 class LookupServiceTest {
 
+    private static final UUID USER_ID = UUID.randomUUID();
+
     private final ReleaseRepository releaseRepository = mock(ReleaseRepository.class);
     private final ExternalLookupService externalLookupService = mock(ExternalLookupService.class);
+    private final OwnershipService ownershipService = mock(OwnershipService.class);
+    private final UserService userService = mock(UserService.class);
     private final LookupService service = new LookupService(releaseRepository, externalLookupService,
-            new ReleaseMapperImpl());
+            new ReleaseMapperImpl(), ownershipService, userService);
+    private final Jwt jwt = Jwt.withTokenValue("t").header("alg", "none").subject("alice").build();
+
+    @BeforeEach
+    void setUp() {
+        AppUser user = mock(AppUser.class);
+        given(user.getId()).willReturn(USER_ID);
+        given(userService.getOrCreate(jwt)).willReturn(user);
+        // Doorgeven zonder te verrijken; de verrijking zelf wordt in OwnershipServiceTest getest.
+        given(ownershipService.withOwnedCounts(eq(USER_ID), any())).willAnswer(inv -> inv.getArgument(1));
+    }
 
     @Test
     void barcodeIsNormalizedAndLocalCatalogComesFirst() {
         given(releaseRepository.findByBarcodeInAndSourceNot(List.of("724385522925", "0724385522925"),
                 MetadataSource.MANUAL)).willReturn(List.of(discogsRelease()));
 
-        List<ReleaseCandidateDto> candidates = service.lookupBarcode("7 24385-52292 5");
+        List<ReleaseCandidateDto> candidates = service.lookupBarcode(jwt, "7 24385-52292 5");
 
         assertThat(candidates).singleElement().satisfies(c -> {
             assertThat(c.source()).isEqualTo(MetadataSource.DISCOGS);
@@ -55,21 +74,21 @@ class LookupServiceTest {
         given(externalLookupService.findByBarcode("724385522925"))
                 .willReturn(List.of(ExternalLookupServiceTest.candidate(MetadataSource.MUSICBRAINZ, "mb")));
 
-        assertThat(service.lookupBarcode("724385522925")).hasSize(1);
+        assertThat(service.lookupBarcode(jwt, "724385522925")).hasSize(1);
     }
 
     @Test
     void invalidBarcodeIsRejected() {
-        assertThatThrownBy(() -> service.lookupBarcode("abc")).isInstanceOf(InvalidRequestException.class);
-        verifyNoInteractions(releaseRepository, externalLookupService);
+        assertThatThrownBy(() -> service.lookupBarcode(jwt, "abc")).isInstanceOf(InvalidRequestException.class);
+        verifyNoInteractions(releaseRepository, externalLookupService, ownershipService);
     }
 
     @Test
     void searchNeedsArtistOrTitleAndStripsInput() {
-        assertThatThrownBy(() -> service.search(new ReleaseSearchCriteria(" ", null, 1997, null)))
+        assertThatThrownBy(() -> service.search(jwt, new ReleaseSearchCriteria(" ", null, 1997, null)))
                 .isInstanceOf(InvalidRequestException.class);
 
-        service.search(new ReleaseSearchCriteria("  Radiohead ", " ", 1997, MediaType.VINYL));
+        service.search(jwt, new ReleaseSearchCriteria("  Radiohead ", " ", 1997, MediaType.VINYL));
         verify(externalLookupService).search(new ReleaseSearchCriteria("Radiohead", null, 1997, MediaType.VINYL));
     }
 
