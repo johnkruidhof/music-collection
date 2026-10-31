@@ -47,12 +47,11 @@ services:
       postgres:
         condition: service_healthy
     healthcheck:
-      test:
-        - CMD-SHELL
-        - >-
-          exec 3<>/dev/tcp/127.0.0.1/9000 &&
-          printf 'GET /auth/health/ready HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n' >&3 &&
-          grep -q '"UP"' <&3
+      # string-vorm = CMD-SHELL (de lijstvorm geeft in IntelliJ onterecht "Single value is expected")
+      test: >-
+        exec 3<>/dev/tcp/127.0.0.1/9000 &&
+        printf 'GET /auth/health/ready HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n' >&3 &&
+        grep -q '"UP"' <&3
       interval: 10s
       timeout: 5s
       retries: 30

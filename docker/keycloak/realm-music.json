@@ -21,6 +21,8 @@
     "realm": [
       { "name": "user", "description": "Gewone gebruiker met een eigen collectie" },
       { "name": "admin", "description": "Beheerder: catalogus en gebruikers" },
+      { "name": "offline_access", "description": "${role_offline-access}" },
+      { "name": "uma_authorization", "description": "${role_uma_authorization}" },
       {
         "name": "default-roles-music",
         "description": "Standaardrollen voor nieuwe (zelf geregistreerde) gebruikers",
