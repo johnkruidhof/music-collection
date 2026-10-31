@@ -19,11 +19,13 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 
+import nl.johnkruidhof.musiccollection.TestDatabase;
 import nl.johnkruidhof.musiccollection.TestcontainersConfiguration;
 import nl.johnkruidhof.musiccollection.entity.MediaType;
 import nl.johnkruidhof.musiccollection.entity.MetadataSource;
@@ -56,13 +58,15 @@ class CoverCacheServiceIntegrationTest {
     @Autowired
     private CollectionItemRepository collectionItemRepository;
 
+    @Autowired
+    private JdbcTemplate jdbc;
+
     @MockitoBean
     private ExternalLookupService externalLookupService;
 
     @BeforeEach
     void cleanDatabase() {
-        collectionItemRepository.deleteAll();
-        releaseRepository.deleteAll();
+        TestDatabase.clean(jdbc);
     }
 
     @Test

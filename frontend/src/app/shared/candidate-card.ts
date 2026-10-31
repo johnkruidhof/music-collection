@@ -65,6 +65,15 @@ import { MediaTypePipe, SourcePipe } from './label.pipes';
           {{ owned() > 0 ? 'Nog een exemplaar' : 'Toevoegen' }}
         </button>
       }
+      @if (wishable()) {
+        @if (wished()) {
+          <span class="wished"><mat-icon>bookmark_added</mat-icon> Op je verlanglijst</span>
+        } @else {
+          <button mat-button type="button" [disabled]="wishBusy()" (click)="wish.emit(candidate())">
+            <mat-icon>bookmark_add</mat-icon> Op verlanglijst
+          </button>
+        }
+      }
       <ng-content />
     </div>
   `,
@@ -131,6 +140,13 @@ import { MediaTypePipe, SourcePipe } from './label.pipes';
       gap: 8px;
       align-items: center;
     }
+    .wished {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.9rem;
+      color: var(--mat-sys-on-surface-variant);
+    }
     .added {
       display: inline-flex;
       align-items: center;
@@ -158,6 +174,14 @@ export class CandidateCard {
   readonly busy = input(false);
   readonly added = input(false);
   readonly add = output<ReleaseCandidate>();
+  /** Toon de knop "Op verlanglijst" (F-24). */
+  readonly wishable = input(false);
+  readonly wishBusy = input(false);
+  /** Lokaal op de verlanglijst gezet; anders telt {@code candidate.onWishlist}. */
+  readonly wishedLocally = input(false);
+  readonly wish = output<ReleaseCandidate>();
+
+  protected readonly wished = computed(() => this.wishedLocally() || !!this.candidate().onWishlist);
 
   protected readonly owned = computed(() => this.candidate().ownedCount ?? 0);
 }

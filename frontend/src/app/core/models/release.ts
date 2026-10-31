@@ -38,6 +38,8 @@ export interface ReleaseCandidate {
   coverThumbnailUrl: string | null;
   /** Aantal exemplaren dat de gebruiker al heeft (F-23); null = onbekend. */
   ownedCount?: number | null;
+  /** Staat op de verlanglijst van de gebruiker (F-24). */
+  onWishlist?: boolean | null;
 }
 
 export interface Track {

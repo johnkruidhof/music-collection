@@ -51,14 +51,15 @@ class LookupControllerTest {
     void barcodeLookupReturnsCandidates() throws Exception {
         given(lookupService.lookupBarcode(any(), eq("724385522925"))).willReturn(List.of(new ReleaseCandidateDto(
                 MetadataSource.DISCOGS, "2149389", "Radiohead", "OK Computer", 1997, MediaType.VINYL,
-                "Vinyl, LP, Album", "Parlophone", "NODATA 02", "UK", "724385522925", "https://img/thumb.jpg", 2)));
+                "Vinyl, LP, Album", "Parlophone", "NODATA 02", "UK", "724385522925", "https://img/thumb.jpg", 2, true)));
 
         mockMvc.perform(get("/api/lookup/barcode/724385522925").with(jwt()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].source").value("DISCOGS"))
                 .andExpect(jsonPath("$[0].externalId").value("2149389"))
                 .andExpect(jsonPath("$[0].mediaType").value("VINYL"))
-                .andExpect(jsonPath("$[0].ownedCount").value(2));
+                .andExpect(jsonPath("$[0].ownedCount").value(2))
+                .andExpect(jsonPath("$[0].onWishlist").value(true));
     }
 
     @Test

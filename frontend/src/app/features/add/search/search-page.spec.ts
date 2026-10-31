@@ -4,6 +4,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { of } from 'rxjs';
 import { CollectionApiService } from '../../../core/api/collection-api.service';
 import { LookupApiService } from '../../../core/api/lookup-api.service';
+import { WishlistApiService } from '../../../core/api/wishlist-api.service';
 import { CollectionItem } from '../../../core/models/collection';
 import { Release, ReleaseCandidate } from '../../../core/models/release';
 import { SearchPage } from './search-page';
@@ -60,6 +61,10 @@ describe('SearchPage', () => {
         { provide: LookupApiService, useValue: lookupApi },
         { provide: CollectionApiService, useValue: collectionApi },
         { provide: MatSnackBar, useValue: snackBar },
+        {
+          provide: WishlistApiService,
+          useValue: { addCandidate: vi.fn(() => of({ artist: 'Radiohead', title: 'Kid A' })) },
+        },
       ],
     }).compileComponents();
   });
@@ -102,6 +107,15 @@ describe('SearchPage', () => {
 
     expect(collectionApi.addCandidate).toHaveBeenCalledWith(candidate);
     expect(page.added().has(`MUSICBRAINZ:${candidate.externalId}`)).toBe(true);
+  });
+
+  it('zet een kandidaat op de verlanglijst', async () => {
+    const { fixture, page, el } = await open('/zoeken?title=OK%20Computer');
+
+    (page as unknown as { wishlist: { add(c: ReleaseCandidate): void } }).wishlist.add(candidate);
+    await fixture.whenStable();
+
+    expect(el.textContent).toContain('Op je verlanglijst');
   });
 
   it('klapt de tracks van een kandidaat open en dicht', async () => {

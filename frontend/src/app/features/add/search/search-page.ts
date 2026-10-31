@@ -20,6 +20,7 @@ import {
   ReleaseSearchCriteria,
 } from '../../../core/models/release';
 import { CandidateCard } from '../../../shared/candidate-card';
+import { WishlistActions } from '../../../shared/wishlist-actions';
 import { errorMessage } from '../../../shared/http-error';
 import { DurationPipe, MediaTypePipe } from '../../../shared/label.pipes';
 
@@ -39,6 +40,7 @@ const candidateKey = (c: ReleaseCandidate) => `${c.source}:${c.externalId}`;
  */
 @Component({
   selector: 'app-search-page',
+  providers: [WishlistActions],
   imports: [
     CandidateCard,
     DurationPipe,
@@ -110,6 +112,10 @@ const candidateKey = (c: ReleaseCandidate) => `${c.source}:${c.externalId}`;
             @for (candidate of candidates(); track key(candidate)) {
               <app-candidate-card
                 [candidate]="candidate"
+                [wishable]="true"
+                [wishBusy]="wishlist.isBusy(candidate)"
+                [wishedLocally]="wishlist.isWished(candidate)"
+                (wish)="wishlist.add($event)"
                 [busy]="adding() === key(candidate)"
                 [added]="added().has(key(candidate))"
                 (add)="add($event)"
@@ -230,6 +236,7 @@ const candidateKey = (c: ReleaseCandidate) => `${c.source}:${c.externalId}`;
   `,
 })
 export class SearchPage {
+  protected readonly wishlist = inject(WishlistActions);
   private readonly lookupApi = inject(LookupApiService);
   private readonly collectionApi = inject(CollectionApiService);
   private readonly snackBar = inject(MatSnackBar);

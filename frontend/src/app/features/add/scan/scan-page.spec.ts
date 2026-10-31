@@ -6,6 +6,7 @@ import { Observable, Subject, of, throwError } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CollectionApiService } from '../../../core/api/collection-api.service';
 import { LookupApiService } from '../../../core/api/lookup-api.service';
+import { WishlistApiService } from '../../../core/api/wishlist-api.service';
 import { CollectionItem } from '../../../core/models/collection';
 import { ReleaseCandidate } from '../../../core/models/release';
 import { BarcodeScanner } from './barcode-scanner';
@@ -49,6 +50,10 @@ describe('ScanPage', () => {
         { provide: LookupApiService, useValue: lookupApi },
         { provide: CollectionApiService, useValue: collectionApi },
         { provide: MatSnackBar, useValue: snackBar },
+        {
+          provide: WishlistApiService,
+          useValue: { addCandidate: vi.fn(() => of({ artist: 'Radiohead', title: 'Kid A' })) },
+        },
       ],
     })
       .overrideComponent(ScanPage, {

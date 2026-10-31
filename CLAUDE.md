@@ -143,6 +143,7 @@ release          id, barcode, artist, title, release_year, media_type, format_de
 track            id, release_id, disc_number, position ("A1"), sort_order, title, duration_seconds, artist
 collection_item  id, user_id, release_id, condition_media, condition_sleeve, purchase_date,
                  purchase_price, purchase_location, storage_location, notes, added_at, updated_at
+wishlist_item    id, user_id, release_id (uniek per user+release), notes, added_at   — verlanglijst (V4)
 cover_image      id, release_id (uniek, ON DELETE CASCADE), image, thumbnail (bytea, JPEG), content_type,
                  created_at        — eigen uploads (MANUAL, V2) én lokaal gecachte externe covers (F-21)
 ```
@@ -191,6 +192,10 @@ GET    /api/collection/export                    CSV-export van de eigen collect
 POST   /api/collection/import/discogs            Discogs-collectie-CSV importeren (202 + taak)          ✔
 GET    /api/collection/import/{jobId} | /latest  voortgang van een import                            ✔
 
+GET    /api/wishlist                             verlanglijst                                          ✔
+POST   /api/wishlist                             { source, externalId, notes } (idempotent)            ✔
+DELETE /api/wishlist/{id}                                                                        ✔
+POST   /api/wishlist/{id}/acquire                gekocht → collectie-item (body: eigen velden, optioneel)  ✔
 GET    /api/collection/stats                     aantallen per type, decennium, artiest, staat + waarde   ✔
 ```
 
@@ -305,6 +310,8 @@ npm run format                 # Prettier; format:check doet hetzelfde zonder te
 - Nieuwe databasewijzigingen alleen via een nieuwe Flyway-migratie (`V{n}__omschrijving.sql`);
   bestaande migraties nooit aanpassen.
 - Externe API's in tests altijd mocken met WireMock; nooit echte calls in tests.
+- Integratietests (Testcontainers) ruimen op met `TestDatabase.clean(jdbc)` (TRUNCATE … CASCADE), zodat
+  de volgorde van testklassen niet uitmaakt.
 - Testklassen eindigen op `Test` (ook integratietests, bv. `CollectionServiceIntegrationTest`):
   Surefire draait alleen `*Test`/`*Tests`, Failsafe (`*IT`) is niet geconfigureerd.
 - Bij elke service: unit tests. Bij elke controller: `@WebMvcTest` met
@@ -401,7 +408,10 @@ npm run format                 # Prettier; format:check doet hetzelfde zonder te
   — Kandidaten hebben `ownedCount`; `OwnershipService` vult die per gebruiker ná de (gedeelde) cache in met
   twee groepsquery's. `CandidateCard` toont "Al in je collectie (n×)" en "Nog een exemplaar". Handmatige
   invoer wordt (nog) niet op dubbelen gecontroleerd.
-- [ ] **F-24** Wishlist naast collectie
+- [x] **F-24** Wishlist naast collectie
+  — V4 `wishlist_item` (uniek per gebruiker+release). `/api/wishlist` (GET, POST idempotent, DELETE,
+  `POST /{id}/acquire` → collectie). Kandidaten krijgen `onWishlist` (via `OwnershipService`). Frontend:
+  `/verlanglijst`, knop "Op verlanglijst" op de kandidaatkaart (`WishlistActions` per pagina).
 - [ ] **F-26** PWA: installeerbaar op telefoon, offline collectie bekijken
 - [ ] **F-27** Admin-scherm: catalogus opschonen, releases samenvoegen
 
