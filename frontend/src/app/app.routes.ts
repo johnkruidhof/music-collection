@@ -15,6 +15,13 @@ export const routes: Routes = [
     title: 'Mijn collectie',
   },
   {
+    path: 'collectie/importeren',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/import/import-export-page').then((m) => m.ImportExportPage),
+    title: 'Importeren en exporteren',
+  },
+  {
     path: 'collectie/:id',
     canActivate: [authGuard],
     loadComponent: () =>

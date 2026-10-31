@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import {
   AddToCollectionRequest,
   CollectionItem,
@@ -10,6 +10,7 @@ import {
 } from '../models/collection';
 import { ManualRelease, ReleaseCandidate } from '../models/release';
 import { CollectionStats } from '../models/stats';
+import { ImportJob } from '../models/import-job';
 
 /** /api/collection — de eigen collectie. */
 @Injectable({ providedIn: 'root' })
@@ -24,6 +25,35 @@ export class CollectionApiService {
       }
     }
     return this.http.get<CollectionPage>('/api/collection', { params });
+  }
+
+  /** CSV-export; de bestandsnaam komt uit Content-Disposition. */
+  exportCsv(): Observable<{ blob: Blob; fileName: string }> {
+    return this.http
+      .get('/api/collection/export', { responseType: 'blob', observe: 'response' })
+      .pipe(
+        map((response) => ({
+          blob: response.body ?? new Blob(),
+          fileName:
+            /filename="([^"]+)"/.exec(response.headers.get('Content-Disposition') ?? '')?.[1] ??
+            'muziekcollectie.csv',
+        })),
+      );
+  }
+
+  importDiscogs(file: File): Observable<ImportJob> {
+    const form = new FormData();
+    form.append('file', file, file.name);
+    return this.http.post<ImportJob>('/api/collection/import/discogs', form);
+  }
+
+  importStatus(id: string): Observable<ImportJob> {
+    return this.http.get<ImportJob>(`/api/collection/import/${id}`);
+  }
+
+  /** De laatste import sinds de herstart van de backend, of null (204). */
+  latestImport(): Observable<ImportJob | null> {
+    return this.http.get<ImportJob | null>('/api/collection/import/latest');
   }
 
   stats(): Observable<CollectionStats> {

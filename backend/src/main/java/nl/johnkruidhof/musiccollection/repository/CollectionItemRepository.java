@@ -29,4 +29,6 @@ public interface CollectionItemRepository extends JpaRepository<CollectionItem, 
     long countByUserId(UUID userId);
 
     long countByReleaseId(UUID releaseId);
+
+    long countByUserIdAndReleaseId(UUID userId, UUID releaseId);
 }
