@@ -19,6 +19,14 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./features/add/add-page').then((m) => m.AddPage),
     title: 'Toevoegen',
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'scannen' },
+      {
+        path: 'scannen',
+        loadComponent: () => import('./features/add/scan/scan-page').then((m) => m.ScanPage),
+        title: 'Scannen',
+      },
+    ],
   },
   { path: '**', redirectTo: '' },
 ];
