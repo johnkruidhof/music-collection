@@ -176,11 +176,11 @@ GET    /api/lookup/barcode/{barcode}             kandidaten uit lokale catalogus
 GET    /api/lookup/search?artist=&title=&year=&mediaType=   zoeken zonder barcode                ✔
 GET    /api/lookup/{source}/{externalId}         volledige details (incl. tracks) van één kandidaat   ✔
 
-GET    /api/collection?q=&mediaType=&sort=&page=&size=   eigen collectie (gepagineerd)
-POST   /api/collection                           toevoegen: { source, externalId } óf handmatige data
-GET    /api/collection/{id}
-PUT    /api/collection/{id}                      eigen velden wijzigen (staat, locatie, notities…)
-DELETE /api/collection/{id}
+GET    /api/collection?q=&mediaType=&sort=&page=&size=   eigen collectie (gepagineerd)        ✔
+POST   /api/collection                           toevoegen: { source, externalId } óf { release }, + fields   ✔
+GET    /api/collection/{id}                                                                      ✔
+PUT    /api/collection/{id}                      eigen velden wijzigen (staat, locatie, notities…)   ✔
+DELETE /api/collection/{id}                                                                      ✔
 
 GET    /api/collection/stats                     aantallen per type, per decennium, …
 ```
@@ -292,6 +292,8 @@ npm run format                 # Prettier; format:check doet hetzelfde zonder te
 - Nieuwe databasewijzigingen alleen via een nieuwe Flyway-migratie (`V{n}__omschrijving.sql`);
   bestaande migraties nooit aanpassen.
 - Externe API's in tests altijd mocken met WireMock; nooit echte calls in tests.
+- Testklassen eindigen op `Test` (ook integratietests, bv. `CollectionServiceIntegrationTest`):
+  Surefire draait alleen `*Test`/`*Tests`, Failsafe (`*IT`) is niet geconfigureerd.
 - Bij elke service: unit tests. Bij elke controller: `@WebMvcTest` met
   `@Import({SecurityConfig.class, CorsConfig.class, PropertiesConfig.class})`,
   `@MockitoBean JwtDecoder` en `jwt()` uit spring-security-test (zie `UserControllerTest`).
@@ -340,7 +342,11 @@ npm run format                 # Prettier; format:check doet hetzelfde zonder te
   `ExternalLookupService` (`@Cacheable`, providers op `@Order`: Discogs → MusicBrainz; storing +
   geen resultaat = fout, zodat lege resultaten door storingen niet gecachet worden).
   `RequestThrottle` per provider: `app.<bron>.throttle` (min-interval, max-retries, retry-backoff, max-wait).
-- [ ] **F-13** Collection CRUD-API (alleen eigen items), paginering, filters en zoeken
+- [x] **F-13** Collection CRUD-API (alleen eigen items), paginering, filters en zoeken
+  — `CollectionService` + `CatalogService` (import bij de bron gebeurt **buiten** de transactie, zodat
+  rate limiting geen DB-verbinding vasthoudt; gelijktijdige import → unieke index → bestaande teruglezen).
+  Overzicht via `CollectionItemSpecifications` (altijd `ownedBy`), sorteren op `added|artist|title|year[,asc|desc]`,
+  max. 100 per pagina. Verwijderen van het laatste item van een MANUAL-release ruimt die release op.
 - [ ] **F-14** Frontend: scan-flow met camera + batch-modus
 - [ ] **F-16** Frontend: zoeken op artiest/titel/jaar + kandidaat kiezen
 - [ ] **F-17** Frontend: handmatig toevoegen/bewerken (incl. tracks en eigen cover-upload)
