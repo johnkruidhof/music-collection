@@ -374,7 +374,10 @@ npm run format                 # Prettier; format:check doet hetzelfde zonder te
   — `/collectie?q=&type=&sort=&page=&size=&view=`: alles in de URL (terug vanaf detail komt op dezelfde
   plek uit), zoeken met 300 ms debounce, weergavevoorkeur in `localStorage`, aparte lege-staat voor
   "collectie leeg" en "niets gevonden".
-- [ ] **F-19** Frontend: detailpagina met tracklist en eigen velden (staat, locatie, notities)
+- [x] **F-19** Frontend: detailpagina met tracklist en eigen velden (staat, locatie, notities)
+  — `/collectie/:id`: release + link naar Discogs/MusicBrainz, tracks per disc met totale duur, eigen
+  velden bewerken, "Bewerken" (alleen MANUAL) en verwijderen met `ConfirmDialog`. App draait op
+  locale `nl` (datums) met Nederlandse paginator-teksten (`DutchPaginatorIntl`).
 
 ### Fase 2 — Uitbreidingen
 - [ ] **F-20** Statistieken (per type, decennium, artiest, totale aankoopwaarde)

@@ -1,0 +1,122 @@
+<button mat-button type="button" class="back" (click)="back()">
+  <mat-icon>arrow_back</mat-icon> Collectie
+</button>
+
+@if (loadError()) {
+  <p class="error">{{ loadError() }}</p>
+} @else if (release(); as release) {
+  <article class="release">
+    <app-cover
+      class="cover"
+      [url]="release.coverImageUrl ?? release.coverThumbnailUrl"
+      [alt]="release.title"
+    />
+
+    <div class="info">
+      <div class="artist">{{ release.artist }}</div>
+      <h1>{{ release.title }}</h1>
+      <dl>
+        <dt>Type</dt>
+        <dd>
+          {{ release.mediaType | mediaType
+          }}{{ release.formatDetails ? ' — ' + release.formatDetails : '' }}
+        </dd>
+        @if (release.releaseYear) {
+          <dt>Jaar</dt>
+          <dd>{{ release.releaseYear }}</dd>
+        }
+        @if (release.label || release.catalogNumber) {
+          <dt>Label</dt>
+          <dd>
+            {{ release.label }}{{ release.label && release.catalogNumber ? ' – ' : ''
+            }}{{ release.catalogNumber }}
+          </dd>
+        }
+        @if (release.country) {
+          <dt>Land</dt>
+          <dd>{{ release.country }}</dd>
+        }
+        @if (release.barcode) {
+          <dt>Barcode</dt>
+          <dd>{{ release.barcode }}</dd>
+        }
+        <dt>Bron</dt>
+        <dd>
+          @if (externalUrl(); as url) {
+            <a [href]="url" target="_blank" rel="noopener noreferrer">
+              {{ release.source | source }} <mat-icon inline>open_in_new</mat-icon>
+            </a>
+          } @else {
+            {{ release.source | source }}
+          }
+        </dd>
+        <dt>Toegevoegd</dt>
+        <dd>{{ item()?.addedAt | date: 'd MMMM y' }}</dd>
+      </dl>
+
+      <div class="actions">
+        @if (release.source === 'MANUAL') {
+          <a mat-stroked-button [routerLink]="['/collectie', id(), 'bewerken']">
+            <mat-icon>edit</mat-icon> Bewerken
+          </a>
+        }
+        <button mat-button type="button" class="delete" (click)="confirmDelete()">
+          <mat-icon>delete</mat-icon> Verwijderen
+        </button>
+      </div>
+    </div>
+  </article>
+
+  <div class="columns">
+    <section class="tracklist">
+      <h2>
+        Tracks
+        @if (totalDuration(); as total) {
+          <span class="total">{{ total | duration }}</span>
+        }
+      </h2>
+      @if (discs().length === 0) {
+        <p class="hint">Geen tracklist bekend.</p>
+      }
+      @for (disc of discs(); track disc.number) {
+        @if (discs().length > 1) {
+          <h3>Disc {{ disc.number }}</h3>
+        }
+        <ol>
+          @for (track of disc.tracks; track track.sortOrder) {
+            <li>
+              <span class="pos">{{ track.position }}</span>
+              <span class="track-title">
+                {{ track.title }}
+                @if (track.artist) {
+                  <span class="track-artist">{{ track.artist }}</span>
+                }
+              </span>
+              <span class="dur">{{ track.durationSeconds | duration }}</span>
+            </li>
+          }
+        </ol>
+      }
+    </section>
+
+    <section class="own">
+      <h2>Mijn exemplaar</h2>
+      <form (ngSubmit)="saveFields()">
+        <app-collection-fields-form [form]="fields" />
+        <div class="form-actions">
+          <button mat-flat-button type="submit" [disabled]="fields.pristine || saving()">
+            <mat-icon>save</mat-icon> Opslaan
+          </button>
+          @if (fields.dirty) {
+            <button mat-button type="button" (click)="resetFields()">Annuleren</button>
+          }
+        </div>
+        @if (saving()) {
+          <mat-progress-bar mode="indeterminate" />
+        }
+      </form>
+    </section>
+  </div>
+} @else {
+  <mat-progress-bar mode="indeterminate" />
+}
