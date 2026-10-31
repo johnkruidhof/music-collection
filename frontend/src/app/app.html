@@ -1,0 +1,32 @@
+<mat-toolbar class="toolbar">
+  <a routerLink="/" class="brand">
+    <mat-icon>album</mat-icon>
+    <span>Muziekcollectie</span>
+  </a>
+
+  @if (auth.isLoggedIn()) {
+    <nav class="nav">
+      <a mat-button routerLink="/collectie" routerLinkActive="active">
+        <mat-icon>library_music</mat-icon><span class="label">Collectie</span>
+      </a>
+      <a mat-button routerLink="/toevoegen" routerLinkActive="active">
+        <mat-icon>qr_code_scanner</mat-icon><span class="label">Toevoegen</span>
+      </a>
+    </nav>
+  }
+
+  <span class="spacer"></span>
+
+  @if (auth.isLoggedIn()) {
+    <span class="user">{{ auth.displayName() }}</span>
+    <button mat-icon-button (click)="auth.logout()" aria-label="Uitloggen" title="Uitloggen">
+      <mat-icon>logout</mat-icon>
+    </button>
+  } @else {
+    <button mat-button (click)="auth.login()">Inloggen</button>
+  }
+</mat-toolbar>
+
+<main class="content">
+  <router-outlet />
+</main>

@@ -1,0 +1,17 @@
+# Secrets
+.env
+caddy-root.crt
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.DS_Store
+
+# Backend
+backend/target/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/

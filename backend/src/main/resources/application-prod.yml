@@ -1,0 +1,4 @@
+# Profiel voor de backend in Docker. Alle waarden komen uit env-vars (zie docker-compose.yml / .env).
+logging:
+  level:
+    nl.johnkruidhof.musiccollection: INFO

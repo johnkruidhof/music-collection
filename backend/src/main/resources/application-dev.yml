@@ -1,0 +1,14 @@
+# Lokaal ontwikkelen: backend vanuit IntelliJ, Postgres + Keycloak + Caddy in Docker.
+app:
+  cors:
+    allowed-origins: http://localhost:4200
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
+logging:
+  level:
+    nl.johnkruidhof.musiccollection: DEBUG

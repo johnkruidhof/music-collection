@@ -1,0 +1,22 @@
+{
+	# Eigen lokale CA voor thuisgebruik (ook voor IP-adressen).
+	# Bij publiek online gaan: deze regel weghalen en APP_HOST op een echt domein zetten,
+	# dan haalt Caddy automatisch een Let's Encrypt-certificaat op.
+	local_certs
+}
+
+{$APP_HOST:localhost} {
+	encode zstd gzip
+
+	handle /api/* {
+		reverse_proxy backend:8080
+	}
+
+	handle /auth/* {
+		reverse_proxy keycloak:8080
+	}
+
+	handle {
+		reverse_proxy frontend:80
+	}
+}
