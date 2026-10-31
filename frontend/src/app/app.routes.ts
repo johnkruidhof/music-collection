@@ -15,6 +15,13 @@ export const routes: Routes = [
     title: 'Mijn collectie',
   },
   {
+    path: 'collectie/:id',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/collection/collection-item-page').then((m) => m.CollectionItemPage),
+    title: 'Release',
+  },
+  {
     path: 'collectie/:id/bewerken',
     canActivate: [authGuard],
     loadComponent: () =>
