@@ -81,3 +81,10 @@ app:
       min-interval: 1100ms      # max 1 request/seconde, iets marge
       max-retries: 2
       retry-backoff: 2s
+  covers:
+    cache-enabled: ${APP_COVERS_CACHE_ENABLED:true}
+    max-attempts: 3
+    batch-size: 25
+    min-interval: 500ms
+    backfill-initial-delay: PT1M
+    backfill-interval: PT10M

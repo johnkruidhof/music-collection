@@ -73,6 +73,14 @@ public class Release {
     @Column(name = "cover_thumbnail_url")
     private String coverThumbnailUrl;
 
+    /** Originele (externe) cover-URL zodra de cover lokaal gecachet is (F-21). */
+    @Column(name = "cover_source_url")
+    private String coverSourceUrl;
+
+    /** Aantal mislukte pogingen om de cover lokaal te cachen. */
+    @Column(name = "cover_cache_attempts", nullable = false)
+    private int coverCacheAttempts;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private MetadataSource source;
