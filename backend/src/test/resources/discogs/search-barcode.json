@@ -1,0 +1,33 @@
+{
+  "pagination": { "page": 1, "pages": 1, "per_page": 25, "items": 2, "urls": {} },
+  "results": [
+    {
+      "id": 2149389,
+      "type": "release",
+      "title": "Radiohead - OK Computer",
+      "year": "1997",
+      "country": "UK",
+      "format": ["Vinyl", "LP", "Album"],
+      "label": ["Parlophone", "Parlophone"],
+      "catno": "NODATA 02",
+      "barcode": ["7 24385 52291 2", "NODATA 02-A1"],
+      "thumb": "https://i.discogs.com/thumb-2149389.jpg",
+      "cover_image": "https://i.discogs.com/cover-2149389.jpg",
+      "resource_url": "https://api.discogs.com/releases/2149389",
+      "community": { "want": 1000, "have": 5000 }
+    },
+    {
+      "id": 1234567,
+      "type": "release",
+      "title": "Radiohead - OK Computer",
+      "year": "",
+      "country": "Europe",
+      "format": ["CD", "Album"],
+      "label": ["Parlophone"],
+      "catno": "",
+      "barcode": [],
+      "thumb": "",
+      "cover_image": "https://st.discogs.com/images/spacer.gif"
+    }
+  ]
+}

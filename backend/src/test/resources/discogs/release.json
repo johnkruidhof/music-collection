@@ -1,0 +1,45 @@
+{
+  "id": 2149389,
+  "status": "Accepted",
+  "title": "OK Computer",
+  "artists": [
+    { "name": "Radiohead", "anv": "", "join": "", "role": "", "id": 3840 }
+  ],
+  "year": 1997,
+  "country": "UK",
+  "labels": [
+    { "name": "Parlophone", "catno": "NODATA 02", "id": 2294 },
+    { "name": "Parlophone", "catno": "7243 8 55229 1 3", "id": 2294 }
+  ],
+  "formats": [
+    { "name": "Vinyl", "qty": "2", "descriptions": ["LP", "Album"], "text": "180 gram" }
+  ],
+  "identifiers": [
+    { "type": "Matrix / Runout", "value": "NODATA 02-A1" },
+    { "type": "Barcode", "value": "7 24385 52291 2" }
+  ],
+  "images": [
+    { "type": "secondary", "uri": "https://i.discogs.com/back.jpg", "uri150": "https://i.discogs.com/back-150.jpg" },
+    { "type": "primary", "uri": "https://i.discogs.com/front.jpg", "uri150": "https://i.discogs.com/front-150.jpg" }
+  ],
+  "tracklist": [
+    { "position": "", "type_": "heading", "title": "Side One", "duration": "" },
+    { "position": "A1", "type_": "track", "title": "Airbag", "duration": "4:44" },
+    { "position": "A2", "type_": "track", "title": "Paranoid Android", "duration": "6:23" },
+    {
+      "position": "", "type_": "index", "title": "Suite", "duration": "",
+      "sub_tracks": [
+        { "position": "B1a", "type_": "track", "title": "Subterranean Homesick Alien", "duration": "4:27" },
+        { "position": "B1b", "type_": "track", "title": "Exit Music (For A Film)", "duration": "4:24" }
+      ]
+    },
+    {
+      "position": "C1", "type_": "track", "title": "Karma Police", "duration": "4:21",
+      "artists": [
+        { "name": "Radiohead", "anv": "", "join": "feat.", "id": 3840 },
+        { "name": "Thom Yorke (2)", "anv": "", "join": "", "id": 1 }
+      ]
+    },
+    { "position": "D1", "type_": "track", "title": "The Tourist", "duration": "" }
+  ]
+}
