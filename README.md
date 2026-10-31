@@ -46,11 +46,11 @@ docker compose up -d postgres keycloak caddy
 
 # backend: open de map backend/ in IntelliJ als Maven-project en start MusicCollectionApplication
 #          (profiel 'dev' is standaard actief), of:
-cd backend && mvn spring-boot:run
+cd backend && ./mvnw spring-boot:run
 
 # frontend
 cd frontend && npm install && npm start      # http://localhost:4200
 ```
 
 - Swagger UI (dev): http://localhost:8080/swagger-ui.html
-- `mvn verify` draait ook integratietests met Testcontainers en heeft dus een draaiende Docker nodig.
+- `./mvnw verify` draait ook integratietests met Testcontainers en heeft dus een draaiende Docker nodig.

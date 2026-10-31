@@ -264,8 +264,8 @@ docker compose up -d --build
 docker compose down            # -v erbij wist ook database en certificaten
 
 # backend (map backend/)
-mvn spring-boot:run            # profiel 'dev'
-mvn verify                     # unit + integratietests (Testcontainers → Docker nodig)
+./mvnw spring-boot:run          # profiel 'dev'
+./mvnw verify                   # unit + integratietests (Testcontainers → Docker nodig)
 
 # frontend (map frontend/)
 npm install
@@ -297,9 +297,9 @@ npx ng test --watch=false
 
 ### Fase 0 — Raamwerk
 - [x] **F-01** Monorepo-structuur, `.gitignore`, `README.md`, `.env.example`
-  — GitHub-repo aanmaken en eerste push nog doen.
+  — GitHub-repo aangemaakt en gepusht (remote via SSH).
 - [x] **F-02** Backend skeleton: Maven, Java 25, Spring Boot 4.1, package-structuur uit §4.1
-  — *nog niet gecompileerd*: eerst `mvn verify` draaien en eventuele versie-/importfouten oplossen.
+  — compileert; `./mvnw verify` en CI zijn groen.
 - [x] **F-03** Docker Compose: Postgres, Keycloak (realm-import), backend, frontend, Caddy
 - [x] **F-04** Keycloak realm `music` met clients, rollen, self-registration, testgebruikers
 - [x] **F-05** Backend security: resource server, JWT + audience, rolmapping, `GET /api/me`
@@ -308,7 +308,9 @@ npx ng test --watch=false
 - [x] **F-08** GlobalExceptionHandler met ProblemDetail
 - [x] **F-09** GitHub Actions CI: backend `verify`, frontend build + test
 - [x] **F-15** HTTPS via Caddy met lokale CA, zodat scannen met de telefoon werkt
-- [ ] **F-0a** Maven Wrapper toevoegen (`mvn wrapper:wrapper`) en Dockerfile/CI/README op `./mvnw` zetten
+- [x] **F-0a** Maven Wrapper toevoegen (`mvn wrapper:wrapper`) en Dockerfile/CI/README op `./mvnw` zetten
+  — wrapper 3.3.4 (only-script) met Maven 3.9.16; Dockerfile bouwt op `eclipse-temurin:25-jdk`;
+  `.gitattributes` houdt `mvnw` op LF.
 - [ ] **F-0b** ESLint (`ng add angular-eslint`) + Prettier-config en `npm run lint` in CI
 
 ### Fase 1 — MVP collectiebeheer

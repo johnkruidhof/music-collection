@@ -19,7 +19,7 @@ jobs:
           java-version: '25'
           cache: maven
       # Testcontainers gebruikt de Docker-daemon van de runner.
-      - run: mvn -B verify
+      - run: ./mvnw -B verify
 
   frontend:
     runs-on: ubuntu-latest
