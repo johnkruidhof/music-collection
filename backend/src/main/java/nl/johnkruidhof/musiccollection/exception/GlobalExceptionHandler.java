@@ -47,6 +47,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return pd;
     }
 
+    @ExceptionHandler(RecognitionUnavailableException.class)
+    ProblemDetail handleRecognitionUnavailable(RecognitionUnavailableException ex) {
+        return problem(HttpStatus.SERVICE_UNAVAILABLE, "recognition-unavailable", "Luisteren niet beschikbaar",
+                ex.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     ProblemDetail handleUnexpected(Exception ex) {
         log.error("Onverwachte fout", ex);

@@ -35,6 +35,19 @@ public interface CollectionItemRepository extends JpaRepository<CollectionItem, 
 
     long countByUserIdAndReleaseId(UUID userId, UUID releaseId);
 
+    /**
+     * Eigen items bij een herkend nummer (F-30): artiest bevat {@code artist} en een track of de releasetitel
+     * bevat {@code title} / {@code album}. Patronen in kleine letters, LIKE-escape '\\'.
+     */
+    @EntityGraph(attributePaths = "release")
+    @Query("""
+            select distinct ci from CollectionItem ci join ci.release r left join r.tracks t
+            where ci.user.id = :userId
+              and lower(r.artist) like :artist escape '\\'
+              and (lower(t.title) like :title escape '\\' or lower(r.title) like :album escape '\\'
+                   or lower(r.title) like :title escape '\\')""")
+    List<CollectionItem> findByRecognizedTrack(UUID userId, String artist, String title, String album);
+
     /** Aantal exemplaren per extern id (F-23). */
     interface ExternalIdCount {
         String getExternalId();

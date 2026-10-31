@@ -159,6 +159,7 @@ release per gebruiker zijn toegestaan.
 | **Discogs API** | Primaire bron: barcode, zoeken, formaat, tracks, cover | Personal access token (`DISCOGS_TOKEN`), verplichte `User-Agent`, 60 req/min |
 | **MusicBrainz API** | Fallback / aanvulling | Geen token, verplichte `User-Agent`, max 1 req/s |
 | **Cover Art Archive** | Covers bij MusicBrainz-releases | Geen token |
+| **AudD** | Muziekherkenning uit een microfoonopname (F-30) | `AUDD_API_TOKEN`, betaald per verzoek (300 gratis) |
 
 Strategie lookup (F-12):
 1. Barcode normaliseren (spaties/streepjes weg, UPC-A ↔ EAN-13 met voorloopnul).
@@ -200,6 +201,8 @@ GET    /api/admin/releases?q=&source=&page=&size=   catalogus + gebruik (rol adm
 DELETE /api/admin/releases/{id}                  alleen ongebruikte release (rol admin)                ✔
 DELETE /api/admin/releases/unused                alle ongebruikte releases opruimen (rol admin)        ✔
 POST   /api/admin/releases/{id}/merge            { targetId }: samenvoegen (rol admin)                 ✔
+GET    /api/recognize/status                     { enabled } — is luisteren ingesteld?                  ✔
+POST   /api/recognize                            multipart `file` (~10 s audio) → nummer + collectie + kandidaten  ✔
 GET    /api/collection/stats                     aantallen per type, decennium, artiest, staat + waarde   ✔
 ```
 
@@ -428,7 +431,11 @@ npm run format                 # Prettier; format:check doet hetzelfde zonder te
   `adminGuard` (rollen uit `/api/me` via `CurrentUserService`); menu-item alleen voor admins.
 
 ### Fase 3 — Audio-herkenning ("luisteren")
-- [ ] **F-30** Onderzoek & proof of concept audioherkenning
+- [x] **F-30** Onderzoek & proof of concept audioherkenning
+  — Gekozen: **AudD** (zie `docs/F-30-audioherkenning.md`). `client.AudioRecognizer` + `AuddRecognizer`
+  (`AUDD_API_TOKEN`, `app.audd.*`), `POST /api/recognize` → herkend nummer + eigen items (artiest + track-
+  of releasetitel) + kandidaten (zoeken op artiest + album). Zonder token: 503 en `GET /api/recognize/status`
+  → `enabled: false`. Open: WebM/Opus-ondersteuning bij AudD verifiëren met een echte sleutel.
   - In de browser haalbaar: `getUserMedia` + `MediaRecorder` neemt ~10 s op via de microfoon
     (HTTPS vereist — via Caddy al geregeld).
   - Backend stuurt het fragment naar een herkenningsdienst:
