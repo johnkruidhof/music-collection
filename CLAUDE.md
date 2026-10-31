@@ -103,6 +103,12 @@ nl.johnkruidhof.musiccollection
     └── musicbrainz/
 ```
 
+`client/<bron>/` bevat per externe bron de `@HttpExchange`-interface (bv. `DiscogsApi`), de
+response-records van die API en de `MetadataProvider`-implementatie. Die response-records zijn
+géén DTO's van onze API en staan daarom niet in `dto/`; de vertaling naar onze DTO's gebeurt in een
+MapStruct-mapper in `mapper/` (bv. `DiscogsMapper`). De RestClient-configuratie staat in `config/`
+(bv. `DiscogsClientConfig`).
+
 ### 4.2 Regels
 
 - Verkeer loopt **altijd** `Controller -> Service -> Repository`. Controllers praten nooit direct
@@ -318,7 +324,10 @@ npm run format                 # Prettier; format:check doet hetzelfde zonder te
   Angular CLI 22.2 vereist Node ≥ 24.15.
 
 ### Fase 1 — MVP collectiebeheer
-- [ ] **F-10** Discogs-client (barcode + zoeken + release-details), WireMock-tests
+- [x] **F-10** Discogs-client (barcode + zoeken + release-details), WireMock-tests
+  — `DiscogsApi` + `DiscogsMetadataProvider`, `DiscogsMapper` (o.a. schijfnummer uit positie, duur,
+  formaat → `MediaType`), `DiscogsClientConfig` (token, User-Agent, time-outs). 404 → leeg,
+  overige fouten → `ExternalLookupException`. Rate limiting/retry/caching volgen in F-12.
 - [ ] **F-11** MusicBrainz + Cover Art Archive client als fallback
 - [ ] **F-12** Lookup-service met normalisatie, lokale catalogus-check, caching, rate limiting + lookup-controller
 - [ ] **F-13** Collection CRUD-API (alleen eigen items), paginering, filters en zoeken
