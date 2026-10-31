@@ -22,6 +22,7 @@ import nl.johnkruidhof.musiccollection.dto.collection.AddToCollectionRequest;
 import nl.johnkruidhof.musiccollection.dto.collection.CollectionItemDto;
 import nl.johnkruidhof.musiccollection.dto.collection.CollectionItemFields;
 import nl.johnkruidhof.musiccollection.dto.collection.CollectionPageDto;
+import nl.johnkruidhof.musiccollection.dto.release.ManualReleaseRequest;
 import nl.johnkruidhof.musiccollection.entity.MediaType;
 import nl.johnkruidhof.musiccollection.service.CollectionService;
 
@@ -59,6 +60,13 @@ public class CollectionController {
     public CollectionItemDto update(@AuthenticationPrincipal Jwt jwt, @PathVariable UUID id,
             @Valid @RequestBody CollectionItemFields fields) {
         return collectionService.update(jwt, id, fields);
+    }
+
+    /** Alleen voor handmatig ingevoerde releases. */
+    @PutMapping("/{id}/release")
+    public CollectionItemDto updateRelease(@AuthenticationPrincipal Jwt jwt, @PathVariable UUID id,
+            @Valid @RequestBody ManualReleaseRequest release) {
+        return collectionService.updateRelease(jwt, id, release);
     }
 
     @DeleteMapping("/{id}")

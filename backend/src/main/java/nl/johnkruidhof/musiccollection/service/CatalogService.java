@@ -48,11 +48,22 @@ public class CatalogService {
     @Transactional
     public Release createManual(ManualReleaseRequest request) {
         Release release = releaseMapper.toEntity(request);
+        normalizeBarcode(release);
+        return releaseRepository.save(release);
+    }
+
+    /** Overschrijft gegevens en tracks; cover en bron blijven. */
+    @Transactional
+    public void updateManual(Release release, ManualReleaseRequest request) {
+        releaseMapper.updateEntity(request, release);
+        normalizeBarcode(release);
+    }
+
+    private static void normalizeBarcode(Release release) {
         if (release.getBarcode() != null) {
             String digits = release.getBarcode().replaceAll("[\\s-]", "");
             release.setBarcode(digits.isEmpty() ? null : digits);
         }
-        return releaseRepository.save(release);
     }
 
     private UUID importRelease(MetadataSource source, String externalId) {

@@ -29,6 +29,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/actuator/health/**", "/actuator/info").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        // Covers worden door <img> geladen (zonder token); de URL bevat een onraadbaar UUID.
+                        .requestMatchers(HttpMethod.GET, "/api/covers/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("admin")
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().denyAll())

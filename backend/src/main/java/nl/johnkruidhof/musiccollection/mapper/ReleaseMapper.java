@@ -43,6 +43,17 @@ public interface ReleaseMapper {
     @Mapping(target = "updatedAt", ignore = true)
     Release toEntity(ManualReleaseRequest release);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "source", ignore = true)
+    @Mapping(target = "discogsId", ignore = true)
+    @Mapping(target = "musicbrainzId", ignore = true)
+    @Mapping(target = "coverImageUrl", ignore = true)
+    @Mapping(target = "coverThumbnailUrl", ignore = true)
+    @Mapping(target = "tracks", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    void updateEntity(ManualReleaseRequest request, @MappingTarget Release release);
+
     @AfterMapping
     default void addTracks(ReleaseDto source, @MappingTarget Release release) {
         replaceTracks(release, source.tracks());

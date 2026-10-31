@@ -15,6 +15,13 @@ export const routes: Routes = [
     title: 'Mijn collectie',
   },
   {
+    path: 'collectie/:id/bewerken',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/add/manual/manual-release-page').then((m) => m.ManualReleasePage),
+    title: 'Release bewerken',
+  },
+  {
     path: 'toevoegen',
     canActivate: [authGuard],
     loadComponent: () => import('./features/add/add-page').then((m) => m.AddPage),
@@ -30,6 +37,12 @@ export const routes: Routes = [
         path: 'zoeken',
         loadComponent: () => import('./features/add/search/search-page').then((m) => m.SearchPage),
         title: 'Zoeken',
+      },
+      {
+        path: 'handmatig',
+        loadComponent: () =>
+          import('./features/add/manual/manual-release-page').then((m) => m.ManualReleasePage),
+        title: 'Handmatig toevoegen',
       },
     ],
   },

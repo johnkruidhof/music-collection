@@ -1,0 +1,116 @@
+.page {
+  display: grid;
+  gap: 24px;
+}
+
+.release {
+  display: grid;
+  gap: 16px 24px;
+}
+
+@media (min-width: 720px) {
+  .release {
+    grid-template-columns: 220px 1fr;
+    align-items: start;
+  }
+}
+
+.cover-column {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+}
+
+.cover {
+  width: 220px;
+  max-width: 100%;
+}
+
+.cover-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0 12px;
+}
+
+h2 {
+  margin: 0 0 12px;
+}
+
+.tracks {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.track {
+  display: grid;
+  grid-template-columns: 72px 90px 1fr 90px;
+  grid-template-areas:
+    'disc pos title dur'
+    'artist artist artist actions';
+  gap: 4px 8px;
+  align-items: center;
+  padding: 8px;
+  border-radius: 8px;
+  background: var(--mat-sys-surface-container-low);
+}
+
+.disc {
+  grid-area: disc;
+}
+.pos {
+  grid-area: pos;
+}
+.title {
+  grid-area: title;
+}
+.dur {
+  grid-area: dur;
+}
+.artist {
+  grid-area: artist;
+}
+.track-actions {
+  grid-area: actions;
+  display: flex;
+  justify-content: flex-end;
+}
+
+@media (max-width: 599px) {
+  .track {
+    grid-template-columns: 64px 1fr 80px;
+    grid-template-areas:
+      'disc pos dur'
+      'title title title'
+      'artist artist artist'
+      'actions actions actions';
+  }
+}
+
+.paste {
+  margin-top: 16px;
+}
+
+.paste-field {
+  width: 100%;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.hint {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.error {
+  color: var(--mat-sys-error);
+}
