@@ -38,6 +38,19 @@ De camera werkt in de browser alleen via HTTPS. Caddy maakt daarvoor een eigen, 
    - **macOS/Windows:** importeren in de systeem-sleutelhanger / certificaatbeheer als vertrouwde root
 4. Open `https://<APP_HOST>` op je telefoon.
 
+## Als app installeren (PWA)
+
+De muziekcollectie is een Progressive Web App: kies in de browser **Installeren** (Chrome/Edge) of
+**Deel → Zet op beginscherm** (Safari). De app opent dan zonder adresbalk, met snelkoppelingen naar
+*Scannen* en *Verlanglijst*.
+
+- **Offline:** collectie, details, verlanglijst en statistieken die je eerder hebt bekeken blijven
+  zichtbaar zonder verbinding (inclusief covers). Toevoegen en wijzigen kan alleen online.
+- **Updates:** bij een nieuwe versie verschijnt een melding met *Vernieuwen*.
+- De service worker werkt alleen met een **vertrouwd** certificaat: installeer eerst het root-certificaat
+  van Caddy (zie hierboven), ook op je computer. Zonder dat werkt de site wel, maar niet offline.
+- Uitloggen wist de offline bewaarde gegevens van dit apparaat.
+
 ## Ontwikkelen (IntelliJ + ng serve)
 
 ```bash

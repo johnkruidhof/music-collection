@@ -412,7 +412,12 @@ npm run format                 # Prettier; format:check doet hetzelfde zonder te
   — V4 `wishlist_item` (uniek per gebruiker+release). `/api/wishlist` (GET, POST idempotent, DELETE,
   `POST /{id}/acquire` → collectie). Kandidaten krijgen `onWishlist` (via `OwnershipService`). Frontend:
   `/verlanglijst`, knop "Op verlanglijst" op de kandidaatkaart (`WishlistActions` per pagina).
-- [ ] **F-26** PWA: installeerbaar op telefoon, offline collectie bekijken
+- [x] **F-26** PWA: installeerbaar op telefoon, offline collectie bekijken
+  — `@angular/pwa`; `ngsw-config.json`: navigaties naar `/auth/**` en `/api/**` uitgesloten (anders breekt
+  de Keycloak-login), API-data `freshness` (collectie, verlanglijst, stats, me), covers `performance`.
+  Tokens in `localStorage`; offline met eerdere sessie → `AuthService.offlineSession` (guard laat door,
+  "Offline"-chip). Uitloggen wist de API-caches. nginx: `ngsw-worker.js`/`ngsw.json` `no-cache`.
+  Service worker vereist een vertrouwd certificaat (Caddy-root installeren).
 - [ ] **F-27** Admin-scherm: catalogus opschonen, releases samenvoegen
 
 ### Fase 3 — Audio-herkenning ("luisteren")

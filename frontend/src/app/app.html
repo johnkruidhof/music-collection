@@ -4,7 +4,7 @@
     <span>Muziekcollectie</span>
   </a>
 
-  @if (auth.isLoggedIn()) {
+  @if (auth.hasSession()) {
     <nav class="nav">
       <a mat-button routerLink="/collectie" routerLinkActive="active">
         <mat-icon>library_music</mat-icon><span class="label">Collectie</span>
@@ -23,7 +23,13 @@
 
   <span class="spacer"></span>
 
-  @if (auth.isLoggedIn()) {
+  @if (!auth.online()) {
+    <span class="offline" title="Je bent offline: je ziet de laatst opgehaalde gegevens.">
+      <mat-icon>cloud_off</mat-icon><span class="label">Offline</span>
+    </span>
+  }
+
+  @if (auth.hasSession()) {
     <span class="user">{{ auth.displayName() }}</span>
     <button mat-icon-button (click)="auth.logout()" aria-label="Uitloggen" title="Uitloggen">
       <mat-icon>logout</mat-icon>
