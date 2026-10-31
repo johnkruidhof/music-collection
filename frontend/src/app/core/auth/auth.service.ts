@@ -1,5 +1,4 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
 import { OAuthService } from 'angular-oauth2-oidc';
 import { authConfig } from './auth.config';
 
@@ -12,7 +11,6 @@ interface IdentityClaims {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly oauth = inject(OAuthService);
-  private readonly router = inject(Router);
 
   private readonly loggedIn = signal(false);
   private readonly claims = signal<IdentityClaims | null>(null);
@@ -36,15 +34,17 @@ export class AuthService {
     }
     this.refreshState();
 
-    // Na login terug naar de pagina waar de gebruiker vandaan kwam.
-    const state = this.oauth.state;
-    if (this.loggedIn() && state) {
-      await this.router.navigateByUrl(decodeURIComponent(state));
+    // Na login terug naar de pagina waar de gebruiker vandaan kwam. Dit draait vóór de eerste
+    // router-navigatie (app-initializer); die navigeert naar de browser-URL, dus die zetten we hier.
+    const target = this.loggedIn() ? safeReturnUrl(this.oauth.state) : null;
+    if (target) {
+      window.history.replaceState(window.history.state, '', target);
     }
   }
 
   login(targetUrl = ''): void {
-    this.oauth.initCodeFlow(encodeURIComponent(targetUrl));
+    // Niet zelf coderen: de bibliotheek doet encodeURIComponent op de state (zie safeReturnUrl).
+    this.oauth.initCodeFlow(targetUrl);
   }
 
   /** Opent direct het registratieformulier van Keycloak (self-registration). */
@@ -65,4 +65,18 @@ export class AuthService {
     this.loggedIn.set(valid);
     this.claims.set(valid ? (this.oauth.getIdentityClaims() as IdentityClaims) : null);
   }
+}
+
+/** Alleen interne paden ("/collectie?x=1"), nooit "//evil.example" of een volledige URL. */
+export function safeReturnUrl(state: string | undefined | null): string | null {
+  if (!state) {
+    return null;
+  }
+  let url: string;
+  try {
+    url = decodeURIComponent(state);
+  } catch {
+    return null;
+  }
+  return url.startsWith('/') && !url.startsWith('//') && !url.startsWith('/\\') ? url : null;
 }
