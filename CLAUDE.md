@@ -229,6 +229,8 @@ src/app/
 ```
 
 Routes: `/` (home), `/collectie`, `/toevoegen` — de laatste twee achter `authGuard`.
+`/toevoegen` heeft tabs als child-routes: `scannen`, `zoeken`, `handmatig` (query-param `barcode`
+vult het zoek-/handmatig-formulier voor na een mislukte scan).
 De OIDC-issuer wordt afgeleid van `window.location.origin` (`/auth/realms/music`), zodat één build
 werkt op localhost, een LAN-IP en later een domein; `environment.development.ts` overschrijft dit
 voor `ng serve`.
@@ -347,7 +349,11 @@ npm run format                 # Prettier; format:check doet hetzelfde zonder te
   rate limiting geen DB-verbinding vasthoudt; gelijktijdige import → unieke index → bestaande teruglezen).
   Overzicht via `CollectionItemSpecifications` (altijd `ownedBy`), sorteren op `added|artist|title|year[,asc|desc]`,
   max. 100 per pagina. Verwijderen van het laatste item van een MANUAL-release ruimt die release op.
-- [ ] **F-14** Frontend: scan-flow met camera + batch-modus
+- [x] **F-14** Frontend: scan-flow met camera + batch-modus
+  — `/toevoegen/scannen`: `BarcodeScanner` (zxing lazy geladen; camera blijft lopen, `active` bepaalt of
+  codes doorkomen), `ScanPage` als state machine; handmatige barcode-invoer als fallback. Gedeeld:
+  `core/models`, `core/api` (lookup, collection), `shared/` (Cover met placeholder, CandidateCard,
+  label-pipes, `errorMessage` uit ProblemDetail).
 - [ ] **F-16** Frontend: zoeken op artiest/titel/jaar + kandidaat kiezen
 - [ ] **F-17** Frontend: handmatig toevoegen/bewerken (incl. tracks en eigen cover-upload)
 - [ ] **F-18** Frontend: collectie-overzicht (grid met covers / lijst), filters op type, zoeken, sorteren
