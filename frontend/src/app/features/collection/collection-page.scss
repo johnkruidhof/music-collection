@@ -1,0 +1,160 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.count {
+  color: var(--mat-sys-on-surface-variant);
+  font-weight: 400;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.search {
+  flex: 1 1 260px;
+}
+
+.sort {
+  flex: 0 1 220px;
+}
+
+.types {
+  display: block;
+  margin: 12px 0 16px;
+}
+
+.grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 20px 16px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: inherit;
+  text-decoration: none;
+  border-radius: 8px;
+
+  app-cover {
+    margin-bottom: 6px;
+    transition: transform 120ms ease;
+  }
+
+  &:hover app-cover,
+  &:focus-visible app-cover {
+    transform: scale(1.03);
+  }
+}
+
+.title {
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.artist,
+.meta,
+.format,
+.extra {
+  font-size: 0.875rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 56px 1fr auto;
+  grid-template-areas: 'thumb text meta' 'thumb text extra';
+  gap: 0 16px;
+  align-items: center;
+  padding: 8px;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+  color: inherit;
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--mat-sys-surface-container-low);
+  }
+}
+
+.thumb {
+  grid-area: thumb;
+  width: 56px;
+}
+
+.text {
+  grid-area: text;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.row .meta {
+  grid-area: meta;
+  text-align: right;
+}
+
+.format {
+  display: block;
+}
+
+.extra {
+  grid-area: extra;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+@media (max-width: 599px) {
+  .row {
+    grid-template-columns: 56px 1fr;
+    grid-template-areas: 'thumb text' 'thumb meta' 'thumb extra';
+  }
+  .row .meta,
+  .extra {
+    text-align: left;
+    justify-content: flex-start;
+  }
+}
+
+mat-paginator {
+  margin-top: 16px;
+  background: transparent;
+}
+
+.empty {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 48px 16px;
+  text-align: center;
+
+  mat-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 48px;
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+.error {
+  color: var(--mat-sys-error);
+}
