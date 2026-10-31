@@ -143,6 +143,8 @@ release          id, barcode, artist, title, release_year, media_type, format_de
 track            id, release_id, disc_number, position ("A1"), sort_order, title, duration_seconds, artist
 collection_item  id, user_id, release_id, condition_media, condition_sleeve, purchase_date,
                  purchase_price, purchase_location, storage_location, notes, added_at, updated_at
+cover_image      id, release_id (uniek, ON DELETE CASCADE), image, thumbnail (bytea, JPEG), content_type,
+                 created_at                                   — eigen covers, alleen MANUAL-releases (V2)
 ```
 
 Enums: `MediaType` (VINYL, CD, DVD, BLU_RAY, CASSETTE, OTHER), `MetadataSource` (DISCOGS,
@@ -181,6 +183,10 @@ POST   /api/collection                           toevoegen: { source, externalId
 GET    /api/collection/{id}                                                                      ✔
 PUT    /api/collection/{id}                      eigen velden wijzigen (staat, locatie, notities…)   ✔
 DELETE /api/collection/{id}                                                                      ✔
+PUT    /api/collection/{id}/release              handmatige release + tracks wijzigen (alleen MANUAL)   ✔
+POST   /api/collection/{id}/cover                eigen cover (multipart `file`, alleen MANUAL)          ✔
+DELETE /api/collection/{id}/cover                                                                ✔
+GET    /api/covers/{coverId}[/thumbnail]         publiek (zonder token), lang cachebaar              ✔
 
 GET    /api/collection/stats                     aantallen per type, per decennium, …
 ```
@@ -207,6 +213,8 @@ Swagger UI in het dev-profiel: http://localhost:8080/swagger-ui.html
 - Backend: `issuer-uri` = publieke URL (moet gelijk zijn aan `iss`), `jwk-set-uri` = interne URL
   (`http://keycloak:8080/...` in Docker, `http://localhost:8180/...` vanuit IntelliJ),
   `audiences: music-backend`.
+- `GET /api/covers/**` is publiek: een `<img>` stuurt geen bearer-token mee. De URL bevat een
+  willekeurig UUID en verandert bij elke nieuwe upload.
 - Testgebruikers (alleen dev): `alice/alice` (admin), `bob/bob`.
 - **Dev-instellingen die vóór publiek gaan dicht moeten** (F-40): redirect-URI `https://*`,
   webOrigins `*`, testgebruikers, `start-dev`.
@@ -357,7 +365,11 @@ npm run format                 # Prettier; format:check doet hetzelfde zonder te
 - [x] **F-16** Frontend: zoeken op artiest/titel/jaar + kandidaat kiezen
   — `/toevoegen/zoeken`: criteria in de query-params (terug/verversen werkt), tracks per kandidaat
   openklappen (`GET /api/lookup/{source}/{id}`), "Handmatig invoeren" neemt de criteria mee.
-- [ ] **F-17** Frontend: handmatig toevoegen/bewerken (incl. tracks en eigen cover-upload)
+- [x] **F-17** Frontend: handmatig toevoegen/bewerken (incl. tracks en eigen cover-upload)
+  — `ManualReleasePage` voor `/toevoegen/handmatig` en `/collectie/:id/bewerken` (alleen MANUAL);
+  tracks toevoegen/verplaatsen/plakken (`track-parser`), cover in de browser verkleind (`resizeImage`,
+  EXIF-oriëntatie) en in de backend als JPEG + thumbnail opgeslagen (V2 `cover_image`, `CoverService`).
+  `CollectionFieldsFormComponent` is herbruikbaar voor de detailpagina.
 - [ ] **F-18** Frontend: collectie-overzicht (grid met covers / lijst), filters op type, zoeken, sorteren
 - [ ] **F-19** Frontend: detailpagina met tracklist en eigen velden (staat, locatie, notities)
 

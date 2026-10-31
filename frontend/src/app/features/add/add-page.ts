@@ -41,5 +41,6 @@ export class AddPage {
   protected readonly tabs = [
     { path: 'scannen', label: 'Scannen', icon: 'qr_code_scanner' },
     { path: 'zoeken', label: 'Zoeken', icon: 'search' },
+    { path: 'handmatig', label: 'Handmatig', icon: 'edit' },
   ];
 }

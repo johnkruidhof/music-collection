@@ -18,6 +18,7 @@ import nl.johnkruidhof.musiccollection.dto.collection.AddToCollectionRequest;
 import nl.johnkruidhof.musiccollection.dto.collection.CollectionItemDto;
 import nl.johnkruidhof.musiccollection.dto.collection.CollectionItemFields;
 import nl.johnkruidhof.musiccollection.dto.collection.CollectionPageDto;
+import nl.johnkruidhof.musiccollection.dto.release.ManualReleaseRequest;
 import nl.johnkruidhof.musiccollection.entity.AppUser;
 import nl.johnkruidhof.musiccollection.entity.CollectionItem;
 import nl.johnkruidhof.musiccollection.entity.MediaType;
@@ -104,6 +105,18 @@ public class CollectionService {
     public CollectionItemDto update(Jwt jwt, UUID id, CollectionItemFields fields) {
         CollectionItem item = findOwned(jwt, id);
         collectionItemMapper.applyFields(fields, item);
+        return collectionItemMapper.toDto(collectionItemRepository.saveAndFlush(item));
+    }
+
+    /** Gegevens en tracks van een handmatig ingevoerde release wijzigen (releases van externe bronnen niet). */
+    @Transactional
+    public CollectionItemDto updateRelease(Jwt jwt, UUID id, ManualReleaseRequest request) {
+        CollectionItem item = findOwned(jwt, id);
+        Release release = item.getRelease();
+        if (release.getSource() != MetadataSource.MANUAL) {
+            throw new InvalidRequestException("Alleen een handmatig ingevoerde release kun je bewerken.");
+        }
+        catalogService.updateManual(release, request);
         return collectionItemMapper.toDto(collectionItemRepository.saveAndFlush(item));
     }
 

@@ -8,7 +8,7 @@ import {
   CollectionPage,
   CollectionQuery,
 } from '../models/collection';
-import { ReleaseCandidate } from '../models/release';
+import { ManualRelease, ReleaseCandidate } from '../models/release';
 
 /** /api/collection — de eigen collectie. */
 @Injectable({ providedIn: 'root' })
@@ -40,6 +40,22 @@ export class CollectionApiService {
 
   update(id: string, fields: CollectionItemFields): Observable<CollectionItem> {
     return this.http.put<CollectionItem>(`/api/collection/${id}`, fields);
+  }
+
+  /** Alleen voor handmatig ingevoerde releases. */
+  updateRelease(id: string, release: ManualRelease): Observable<CollectionItem> {
+    return this.http.put<CollectionItem>(`/api/collection/${id}/release`, release);
+  }
+
+  /** Eigen cover (alleen handmatige releases); verklein eerst met {@link resizeImage}. */
+  uploadCover(id: string, image: Blob): Observable<CollectionItem> {
+    const form = new FormData();
+    form.append('file', image, 'cover.jpg');
+    return this.http.post<CollectionItem>(`/api/collection/${id}/cover`, form);
+  }
+
+  deleteCover(id: string): Observable<CollectionItem> {
+    return this.http.delete<CollectionItem>(`/api/collection/${id}/cover`);
   }
 
   delete(id: string): Observable<void> {

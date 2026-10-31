@@ -31,6 +31,12 @@ spring:
           jwk-set-uri: ${OIDC_JWK_SET_URI:http://localhost:8180/auth/realms/music/protocol/openid-connect/certs}
           audiences: music-backend
 
+  servlet:
+    multipart:
+      # Covers worden in de browser al verkleind; dit is de bovengrens voor onbewerkte uploads.
+      max-file-size: 10MB
+      max-request-size: 11MB
+
   cache:
     type: caffeine
     cache-names: barcodeLookup,search,releaseDetails

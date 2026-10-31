@@ -1,0 +1,204 @@
+@if (editing()) {
+  <h1>Release bewerken</h1>
+}
+
+@if (loading()) {
+  <mat-progress-bar mode="indeterminate" />
+} @else if (loadError()) {
+  <p class="error">{{ loadError() }}</p>
+  <a mat-button routerLink="/collectie">Terug naar de collectie</a>
+} @else if (notManual()) {
+  <p>
+    Deze release komt uit Discogs of MusicBrainz en staat in de gedeelde catalogus; die kun je niet
+    bewerken. Je eigen gegevens (staat, locatie, notities) wijzig je op de detailpagina.
+  </p>
+  <a mat-button [routerLink]="['/collectie', id()]">Terug naar de release</a>
+} @else {
+  <form class="page" [formGroup]="form" (ngSubmit)="save()">
+    <section class="release">
+      <div class="cover-column">
+        <app-cover class="cover" [url]="shownCover()" alt="Cover" />
+        <input #fileInput type="file" accept="image/*" hidden (change)="onCoverSelected($event)" />
+        <div class="cover-actions">
+          <button mat-stroked-button type="button" (click)="fileInput.click()">
+            <mat-icon>add_photo_alternate</mat-icon> Cover kiezen
+          </button>
+          @if (shownCover()) {
+            <button mat-button type="button" (click)="clearCover()">Verwijderen</button>
+          }
+        </div>
+        @if (coverError()) {
+          <p class="error">{{ coverError() }}</p>
+        }
+      </div>
+
+      <div class="fields">
+        <mat-form-field appearance="outline">
+          <mat-label>Artiest</mat-label>
+          <input matInput formControlName="artist" required />
+          @if (form.controls.artist.hasError('required')) {
+            <mat-error>Verplicht</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Titel</mat-label>
+          <input matInput formControlName="title" required />
+          @if (form.controls.title.hasError('required')) {
+            <mat-error>Verplicht</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Type</mat-label>
+          <mat-select formControlName="mediaType" required>
+            @for (type of mediaTypes; track type) {
+              <mat-option [value]="type">{{ type | mediaType }}</mat-option>
+            }
+          </mat-select>
+          @if (form.controls.mediaType.hasError('required')) {
+            <mat-error>Kies een type</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Jaar</mat-label>
+          <input matInput formControlName="releaseYear" inputmode="numeric" />
+          @if (form.controls.releaseYear.invalid) {
+            <mat-error>1900–2100</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Formaat</mat-label>
+          <input matInput formControlName="formatDetails" placeholder="bv. 2×LP, 180 gram" />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Label</mat-label>
+          <input matInput formControlName="label" />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Catalogusnummer</mat-label>
+          <input matInput formControlName="catalogNumber" />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Land</mat-label>
+          <input matInput formControlName="country" />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Barcode</mat-label>
+          <input matInput formControlName="barcode" inputmode="numeric" />
+          @if (form.controls.barcode.invalid) {
+            <mat-error>Alleen cijfers, spaties en streepjes</mat-error>
+          }
+        </mat-form-field>
+      </div>
+    </section>
+
+    <section>
+      <h2>Tracks</h2>
+      @if (tracks.length === 0) {
+        <p class="hint">Nog geen tracks. Voeg ze één voor één toe of plak een tracklist.</p>
+      }
+      <div class="tracks" formArrayName="tracks">
+        @for (track of tracks.controls; track track; let i = $index; let last = $last) {
+          <div class="track" [formGroupName]="i">
+            <mat-form-field appearance="outline" class="disc" subscriptSizing="dynamic">
+              <mat-label>Disc</mat-label>
+              <input matInput type="number" min="1" formControlName="discNumber" />
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="pos" subscriptSizing="dynamic">
+              <mat-label>Positie</mat-label>
+              <input matInput formControlName="position" (change)="onPositionChange(i)" />
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="title" subscriptSizing="dynamic">
+              <mat-label>Titel</mat-label>
+              <input matInput formControlName="title" required />
+              @if (track.controls.title.hasError('required')) {
+                <mat-error>Verplicht</mat-error>
+              }
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="dur" subscriptSizing="dynamic">
+              <mat-label>Duur</mat-label>
+              <input matInput formControlName="duration" placeholder="m:ss" />
+              @if (track.controls.duration.invalid) {
+                <mat-error>m:ss</mat-error>
+              }
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="artist" subscriptSizing="dynamic">
+              <mat-label>Artiest (als afwijkend)</mat-label>
+              <input matInput formControlName="artist" />
+            </mat-form-field>
+            <div class="track-actions">
+              <button
+                mat-icon-button
+                type="button"
+                [disabled]="i === 0"
+                (click)="moveTrack(i, -1)"
+                aria-label="Omhoog"
+              >
+                <mat-icon>arrow_upward</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                type="button"
+                [disabled]="last"
+                (click)="moveTrack(i, 1)"
+                aria-label="Omlaag"
+              >
+                <mat-icon>arrow_downward</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                type="button"
+                (click)="removeTrack(i)"
+                aria-label="Track verwijderen"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+      <button mat-stroked-button type="button" (click)="addTrack()">
+        <mat-icon>add</mat-icon> Track toevoegen
+      </button>
+
+      <mat-expansion-panel class="paste">
+        <mat-expansion-panel-header>
+          <mat-panel-title>Tracklist plakken</mat-panel-title>
+        </mat-expansion-panel-header>
+        <p class="hint">
+          Eén track per regel, bijvoorbeeld <code>A1 Airbag 4:44</code> of <code>1. Airbag</code>.
+        </p>
+        <mat-form-field appearance="outline" class="paste-field">
+          <mat-label>Tracklist</mat-label>
+          <textarea matInput [formControl]="pasteText" rows="6"></textarea>
+        </mat-form-field>
+        <button
+          mat-flat-button
+          type="button"
+          [disabled]="!pasteText.value.trim()"
+          (click)="importPastedTracks()"
+        >
+          Toevoegen aan tracks
+        </button>
+      </mat-expansion-panel>
+    </section>
+
+    @if (!editing()) {
+      <section>
+        <h2>Eigen gegevens</h2>
+        <app-collection-fields-form [form]="fields" />
+      </section>
+    }
+
+    <div class="actions">
+      <button mat-flat-button type="submit" [disabled]="saving()">
+        <mat-icon>save</mat-icon> {{ editing() ? 'Opslaan' : 'Toevoegen aan collectie' }}
+      </button>
+      @if (editing()) {
+        <a mat-button [routerLink]="['/collectie', id()]">Annuleren</a>
+      }
+    </div>
+    @if (saving()) {
+      <mat-progress-bar mode="indeterminate" />
+    }
+  </form>
+}
