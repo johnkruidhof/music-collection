@@ -16,6 +16,13 @@ export const routes: Routes = [
     title: 'Mijn collectie',
   },
   {
+    path: 'collectie/luisteren',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/add/listen/listen-page').then((m) => m.ListenPage),
+    data: { mode: 'collection' },
+    title: 'Welke van mijn platen is dit?',
+  },
+  {
     path: 'collectie/importeren',
     canActivate: [authGuard],
     loadComponent: () =>

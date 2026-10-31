@@ -73,11 +73,31 @@ class RecognitionServiceIntegrationTest {
                 "1", "Radiohead", "OK Computer OKNOTOK 1997 2017", 2017, MediaType.VINYL, null, null, null, null, null,
                 null, null, null)));
 
-        RecognitionResultDto result = recognitionService.recognize(ALICE, new byte[] {1, 2}, "opname.webm");
+        RecognitionResultDto result = recognitionService.recognize(ALICE, new byte[] {1, 2}, "opname.webm", false);
 
         assertThat(result.track().title()).isEqualTo("Karma Police (Remastered)");
         assertThat(result.inCollection()).extracting(CollectionItemSummaryDto::title).containsExactly("OK Computer");
+        assertThat(result.trackMatches()).singleElement().satisfies(match -> {
+            assertThat(match.itemId()).isEqualTo(result.inCollection().getFirst().id());
+            assertThat(match.position()).isEqualTo("A2");
+            assertThat(match.title()).isEqualTo("Karma Police");
+        });
         assertThat(result.candidates()).singleElement().satisfies(c -> assertThat(c.ownedCount()).isZero());
+    }
+
+    @Test
+    void collectionScopeSearchesOnlyOwnRecordsAndListsTrackMatchesFirst() {
+        add(ALICE, "Radiohead", "OK Computer OKNOTOK", List.of("Lift"));
+        add(ALICE, "Radiohead", "The Best Of", List.of("Creep", "Karma Police"));
+
+        RecognitionResultDto result = recognitionService.recognize(ALICE, new byte[] {1}, "opname.webm", true);
+
+        // Op "The Best Of" staat het nummer echt; het album "OKNOTOK" past alleen op de releasetitel.
+        assertThat(result.inCollection()).extracting(CollectionItemSummaryDto::title)
+                .containsExactly("The Best Of", "OK Computer OKNOTOK");
+        assertThat(result.trackMatches()).extracting("position").containsExactly("A2");
+        assertThat(result.candidates()).isEmpty();
+        org.mockito.Mockito.verifyNoInteractions(externalLookupService);
     }
 
     @Test
@@ -85,14 +105,17 @@ class RecognitionServiceIntegrationTest {
         add(ALICE, "Radiohead", "OK Computer", List.of("Karma Police"));
         given(externalLookupService.search(any())).willThrow(new ExternalLookupException("Discogs", "plat", null));
 
-        RecognitionResultDto result = recognitionService.recognize(ALICE, new byte[] {1}, "opname.webm");
+        RecognitionResultDto result = recognitionService.recognize(ALICE, new byte[] {1}, "opname.webm", false);
 
         assertThat(result.inCollection()).hasSize(1);
         assertThat(result.candidates()).isEmpty();
     }
 
     private void add(Jwt jwt, String artist, String title, List<String> tracks) {
-        List<TrackDto> trackDtos = tracks.stream().map(t -> new TrackDto(1, null, 0, t, null, null)).toList();
+        List<TrackDto> trackDtos = new java.util.ArrayList<>();
+        for (int i = 0; i < tracks.size(); i++) {
+            trackDtos.add(new TrackDto(1, "A" + (i + 1), 0, tracks.get(i), null, null));
+        }
         collectionService.add(jwt, new AddToCollectionRequest(null, null,
                 new ManualReleaseRequest(null, artist, title, 1997, MediaType.CD, null, null, null, null, trackDtos),
                 null));

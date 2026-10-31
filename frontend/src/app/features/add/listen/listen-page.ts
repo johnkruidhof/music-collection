@@ -1,12 +1,12 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CollectionApiService } from '../../../core/api/collection-api.service';
 import { RecognitionApiService } from '../../../core/api/recognition-api.service';
-import { RecognitionResult } from '../../../core/models/recognition';
+import { RecognitionResult, RecognizedTrack, TrackMatch } from '../../../core/models/recognition';
 import { ReleaseCandidate } from '../../../core/models/release';
 import {
   AudioRecorderService,
@@ -29,7 +29,9 @@ export type ListenState =
 
 /**
  * Luisteren (F-31): ~10 s opnemen terwijl de plaat speelt, herkennen via de backend (AudD) en dan
- * toevoegen, op de verlanglijst zetten of zien dat je hem al hebt.
+ * toevoegen, op de verlanglijst zetten of zien dat je hem al hebt. Met route-data {@code mode: 'collection'}
+ * (F-32, {@code /collectie/luisteren}): "Welke van mijn platen is dit?" — alleen de eigen collectie, met
+ * de track en de opslaglocatie, zonder zoekactie bij Discogs/MusicBrainz.
  */
 @Component({
   selector: 'app-listen-page',
@@ -44,6 +46,10 @@ export type ListenState =
     MatProgressBarModule,
   ],
   template: `
+    @if (collectionMode) {
+      <a mat-button routerLink="/collectie"><mat-icon>arrow_back</mat-icon> Collectie</a>
+      <h1>Welke van mijn platen is dit?</h1>
+    }
     @if (enabled() === false) {
       <p class="notice">
         <mat-icon>info</mat-icon>
@@ -57,9 +63,7 @@ export type ListenState =
       </p>
     } @else {
       <section class="recorder">
-        <p class="hint">
-          Laat de plaat spelen en houd je telefoon of laptop in de buurt van de speaker.
-        </p>
+        <p class="hint">{{ hint }}</p>
         @switch (state().kind) {
           @case ('recording') {
             <div class="meter" aria-hidden="true">
@@ -75,7 +79,7 @@ export type ListenState =
           @default {
             <button mat-flat-button type="button" class="listen" (click)="listen()">
               <mat-icon>hearing</mat-icon>
-              {{ state().kind === 'idle' ? 'Luisteren' : 'Opnieuw luisteren' }}
+              {{ state().kind === 'idle' ? startLabel : 'Opnieuw luisteren' }}
             </button>
           }
         }
@@ -105,54 +109,75 @@ export type ListenState =
 
           @if (r.inCollection.length > 0) {
             <section>
-              <h2><mat-icon>library_add_check</mat-icon> Staat al in je collectie</h2>
-              <ul class="owned">
+              <h2>
+                <mat-icon>library_add_check</mat-icon>
+                {{ collectionMode ? 'In je collectie' : 'Staat al in je collectie' }}
+              </h2>
+              <ul class="owned" [class.large]="collectionMode">
                 @for (item of r.inCollection; track item.id) {
                   <li>
                     <a [routerLink]="['/collectie', item.id]">
                       <app-cover class="thumb" [url]="item.coverThumbnailUrl" [alt]="item.title" />
-                      <span>
-                        <strong>{{ item.title }}</strong
-                        ><br />
-                        <span class="meta">
-                          {{ item.artist }} · {{ item.mediaType | mediaType
-                          }}{{ item.storageLocation ? ' · ' + item.storageLocation : '' }}
-                        </span>
+                      <span class="owned-info">
+                        <strong>{{ item.title }}</strong>
+                        <span class="meta"
+                          >{{ item.artist }} · {{ item.mediaType | mediaType }}</span
+                        >
+                        @if (trackFor(r, item.id); as match) {
+                          <span class="match">
+                            <mat-icon inline>music_note</mat-icon>
+                            {{ match.position ? match.position + ' · ' : '' }}{{ match.title
+                            }}{{ match.discNumber > 1 ? ' (disc ' + match.discNumber + ')' : '' }}
+                          </span>
+                        }
+                        @if (item.storageLocation) {
+                          <span class="location">
+                            <mat-icon inline>place</mat-icon> {{ item.storageLocation }}
+                          </span>
+                        }
                       </span>
                     </a>
                   </li>
                 }
               </ul>
             </section>
+          } @else if (collectionMode) {
+            <p class="notice">
+              <mat-icon>search_off</mat-icon>
+              Dit nummer staat (nog) niet in je collectie.
+              <a mat-button routerLink="/toevoegen/zoeken" [queryParams]="searchParams(track)">
+                Releases zoeken
+              </a>
+            </p>
           }
 
-          <section>
-            <h2>Releases met dit nummer</h2>
-            @if (r.candidates.length === 0) {
-              <p class="hint">
-                Geen releases gevonden. Zoek zelf op
-                <a
-                  [routerLink]="['../zoeken']"
-                  [queryParams]="{ artist: track.artist, title: track.album ?? track.title }"
-                  >artiest en titel</a
-                >.
-              </p>
-            }
-            <div class="candidates">
-              @for (candidate of r.candidates; track candidate.source + candidate.externalId) {
-                <app-candidate-card
-                  [candidate]="candidate"
-                  [busy]="adding() === candidate"
-                  [added]="added().has(candidate)"
-                  [wishable]="true"
-                  [wishBusy]="wishlist.isBusy(candidate)"
-                  [wishedLocally]="wishlist.isWished(candidate)"
-                  (wish)="wishlist.add($event)"
-                  (add)="add($event)"
-                />
+          @if (!collectionMode) {
+            <section>
+              <h2>Releases met dit nummer</h2>
+              @if (r.candidates.length === 0) {
+                <p class="hint">
+                  Geen releases gevonden. Zoek zelf op
+                  <a routerLink="/toevoegen/zoeken" [queryParams]="searchParams(track)"
+                    >artiest en titel</a
+                  >.
+                </p>
               }
-            </div>
-          </section>
+              <div class="candidates">
+                @for (candidate of r.candidates; track candidate.source + candidate.externalId) {
+                  <app-candidate-card
+                    [candidate]="candidate"
+                    [busy]="adding() === candidate"
+                    [added]="added().has(candidate)"
+                    [wishable]="true"
+                    [wishBusy]="wishlist.isBusy(candidate)"
+                    [wishedLocally]="wishlist.isWished(candidate)"
+                    (wish)="wishlist.add($event)"
+                    (add)="add($event)"
+                  />
+                }
+              </div>
+            </section>
+          }
         } @else {
           <p class="notice">
             <mat-icon>help_outline</mat-icon>
@@ -240,6 +265,26 @@ export type ListenState =
       width: 56px;
       flex: none;
     }
+    .owned-info {
+      display: flex;
+      flex-direction: column;
+    }
+    .owned.large .thumb {
+      width: 96px;
+    }
+    .owned.large strong {
+      font-size: 1.15rem;
+    }
+    .match,
+    .location {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .location {
+      font-weight: 500;
+      color: var(--mat-sys-primary);
+    }
     .candidates {
       display: grid;
       gap: 12px;
@@ -260,6 +305,12 @@ export class ListenPage {
   private readonly snackBar = inject(MatSnackBar);
   private readonly router = inject(Router);
   protected readonly wishlist = inject(WishlistActions);
+  /** F-32: "Welke van mijn platen is dit?" (route-data {@code mode: 'collection'}). */
+  protected readonly collectionMode = inject(ActivatedRoute).snapshot.data['mode'] === 'collection';
+  protected readonly hint = this.collectionMode
+    ? 'Laat het nummer spelen; je ziet op welke plaat of cd in je collectie het staat, en waar die ligt.'
+    : 'Laat de plaat spelen en houd je telefoon of laptop in de buurt van de speaker.';
+  protected readonly startLabel = this.collectionMode ? 'Welke plaat is dit?' : 'Luisteren';
 
   /** null = nog onbekend */
   readonly enabled = signal<boolean | null>(null);
@@ -312,10 +363,19 @@ export class ListenPage {
       this.level.set(0);
     }
     this.state.set({ kind: 'recognizing' });
-    this.recognitionApi.recognize(recording.blob, recording.fileName).subscribe({
+    const scope = this.collectionMode ? 'collection' : 'all';
+    this.recognitionApi.recognize(recording.blob, recording.fileName, scope).subscribe({
       next: (result) => this.state.set({ kind: 'result', result }),
       error: (err) => this.state.set({ kind: 'error', message: errorMessage(err) }),
     });
+  }
+
+  protected trackFor(result: RecognitionResult, itemId: string): TrackMatch | undefined {
+    return result.trackMatches.find((m) => m.itemId === itemId);
+  }
+
+  protected searchParams(track: RecognizedTrack): Record<string, string> {
+    return { artist: track.artist, title: track.album ?? track.title };
   }
 
   add(candidate: ReleaseCandidate): void {

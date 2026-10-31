@@ -202,7 +202,7 @@ DELETE /api/admin/releases/{id}                  alleen ongebruikte release (rol
 DELETE /api/admin/releases/unused                alle ongebruikte releases opruimen (rol admin)        ✔
 POST   /api/admin/releases/{id}/merge            { targetId }: samenvoegen (rol admin)                 ✔
 GET    /api/recognize/status                     { enabled } — is luisteren ingesteld?                  ✔
-POST   /api/recognize                            multipart `file` (~10 s audio) → nummer + collectie + kandidaten  ✔
+POST   /api/recognize?scope=all|collection       multipart `file` (~10 s audio) → nummer + collectie (+ tracks) + kandidaten  ✔
 GET    /api/collection/stats                     aantallen per type, decennium, artiest, staat + waarde   ✔
 ```
 
@@ -447,7 +447,10 @@ npm run format                 # Prettier; format:check doet hetzelfde zonder te
   — Tab `/toevoegen/luisteren`: `AudioRecorderService` (10 s `MediaRecorder`, WebM/Opus of MP4/AAC,
   echo-/ruisonderdrukking uit, niveaumeter) → `POST /api/recognize` → nummer, "Staat al in je collectie",
   kandidaten (toevoegen / verlanglijst). Zonder sleutel uitleg over `AUDD_API_TOKEN`.
-- [ ] **F-32** "Welke van mijn platen is dit?"-modus: herkenning beperken tot eigen collectie
+- [x] **F-32** "Welke van mijn platen is dit?"-modus: herkenning beperken tot eigen collectie
+  — `POST /api/recognize?scope=collection`: geen zoekactie bij Discogs/MusicBrainz, wel `trackMatches`
+  (positie/disc van het nummer op het eigen item; items met de track eerst). Frontend `/collectie/luisteren`
+  (zelfde `ListenPage`, route-data `mode: 'collection'`) met track en opslaglocatie; knop op het overzicht.
 
 ### Fase 4 — Publiek online (samen met de gebruiker uitwerken)
 - [ ] **F-40** Hardening: Keycloak `start` (productie) met echte hostname, redirect-URI's en webOrigins

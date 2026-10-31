@@ -12,9 +12,23 @@ export interface RecognizedTrack {
   songLink: string | null;
 }
 
+/** Welke track van een eigen item het herkende nummer is (F-32). */
+export interface TrackMatch {
+  itemId: string;
+  discNumber: number;
+  position: string | null;
+  title: string;
+}
+
 export interface RecognitionResult {
   /** null = niets herkend */
   track: RecognizedTrack | null;
+  /** Eigen items; items waarop het nummer echt als track staat eerst. */
   inCollection: CollectionItemSummary[];
+  trackMatches: TrackMatch[];
+  /** Leeg bij scope 'collection'. */
   candidates: ReleaseCandidate[];
 }
+
+/** 'collection' = alleen in de eigen collectie zoeken ("Welke van mijn platen is dit?"). */
+export type RecognitionScope = 'all' | 'collection';

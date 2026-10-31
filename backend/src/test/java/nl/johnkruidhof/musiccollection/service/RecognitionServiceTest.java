@@ -35,7 +35,7 @@ class RecognitionServiceTest {
     void notConfiguredIsReported() {
         given(recognizer.enabled()).willReturn(false);
 
-        assertThatThrownBy(() -> service.recognize(jwt, new byte[] {1}, "opname.webm"))
+        assertThatThrownBy(() -> service.recognize(jwt, new byte[] {1}, "opname.webm", false))
                 .isInstanceOf(RecognitionUnavailableException.class);
     }
 
@@ -43,7 +43,7 @@ class RecognitionServiceTest {
     void emptyRecordingIsRejected() {
         given(recognizer.enabled()).willReturn(true);
 
-        assertThatThrownBy(() -> service.recognize(jwt, new byte[0], "opname.webm"))
+        assertThatThrownBy(() -> service.recognize(jwt, new byte[0], "opname.webm", false))
                 .isInstanceOf(InvalidRequestException.class);
     }
 
@@ -52,7 +52,7 @@ class RecognitionServiceTest {
         given(recognizer.enabled()).willReturn(true);
         given(recognizer.recognize(any(), any())).willReturn(Optional.empty());
 
-        assertThat(service.recognize(jwt, new byte[] {1}, "../../etc/passwd")).isEqualTo(RecognitionResultDto.NOTHING);
+        assertThat(service.recognize(jwt, new byte[] {1}, "../../etc/passwd", false)).isEqualTo(RecognitionResultDto.NOTHING);
         verifyNoInteractions(lookupService);
     }
 
