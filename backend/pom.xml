@@ -13,7 +13,7 @@
 
     <groupId>nl.johnkruidhof</groupId>
     <artifactId>music-collection-backend</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.9.0</version>
     <name>music-collection-backend</name>
     <description>Backend voor het bijhouden van een muziekcollectie (vinyl, cd, dvd, blu-ray)</description>
 
