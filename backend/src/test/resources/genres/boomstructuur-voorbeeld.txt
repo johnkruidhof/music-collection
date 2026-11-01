@@ -1,0 +1,27 @@
+.
+
+  |-- Alternatieve rock
+  |  |-- A Perfect Circle
+  |  |  |-- 2000 - Mer De Noms
+  |  |  |-- 2003 - Thirteenth Step
+  |  |-- Book of Knots, The
+  |  |  |-- Garden Of Fainting Stars (2011)
+  |  |  |-- Traineater
+  |-- Electronica
+  |  |-- James Blake
+  |  |  |-- (2009) Air And Lack Thereof
+  |  |  |-- (2011) James Blake
+  |-- Hardrock - Metal
+  |  |-- Doom Metal
+  |  |  |-- Candlemass
+  |  |  |  |-- 1986 - Epicus Doomicus Metallicus
+  |  |  |  |-- 1987 - Nightfall
+  |  |-- Progressive Metal
+  |  |  |-- Dream Theater
+  |  |  |  |-- 1992 - Images and Words
+  |  |  |  |  |-- 1992 - Images and Words (Remaster)
+  |  |  |-- Tool
+  |  |  |  |-- 1996 - Aenima
+  |-- Nederlands
+  |  |-- Dijk, De
+  |  |  |-- 1985 - Nooit Meer Slapen

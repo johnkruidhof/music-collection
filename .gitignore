@@ -17,4 +17,4 @@ frontend/dist/
 frontend/.angular/
 
 # Persoonlijke boomstructuur van de muziekcollectie (wordt in de app geüpload, niet in de repo)
-boomstructuur*.txt
+/boomstructuur*.txt
