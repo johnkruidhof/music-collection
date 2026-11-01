@@ -24,6 +24,35 @@ Open daarna **https://localhost** (of `https://<APP_HOST>`).
 
 Nieuwe gebruikers kunnen zichzelf registreren via **Account aanmaken**.
 
+## Wat draait waar
+
+Wachtwoorden staan nooit in de repo: ze komen uit `.env` (zie `.env.example`). Hieronder staat per onderdeel
+de variabele waarin het wachtwoord staat.
+
+| Onderdeel | Adres | Inloggen |
+|---|---|---|
+| **App** | `https://<APP_HOST>` | eigen account, of de testgebruikers `alice` (admin) / `bob` (alleen dev) |
+| **Keycloak-beheer** | `https://<APP_HOST>/auth/admin` | `KEYCLOAK_ADMIN` / `KEYCLOAK_ADMIN_PASSWORD` (realm *master*; de app gebruikt realm *music*) |
+| **Database** (Postgres 17) | `localhost:5432`, database `musiccollection` | gebruiker `music` / `APP_DB_PASSWORD` |
+| Database (beheerder) | `localhost:5432` | gebruiker `postgres` / `POSTGRES_PASSWORD` |
+| **Keycloak direct** | `http://localhost:8180/auth` | alleen voor de backend vanuit IntelliJ (JWKS-sleutels) |
+| **Swagger UI** | `http://localhost:8080/swagger-ui.html` | alleen als je de backend vanuit IntelliJ start (profiel `dev`) |
+| Frontend met `ng serve` | `http://localhost:4200` | zie *Ontwikkelen* hieronder |
+
+### Database bekijken in IntelliJ
+
+Database-paneel → **+** → **Data Source** → **PostgreSQL**, en vul in: host `localhost`, poort `5432`,
+database `musiccollection`, gebruiker `music`, wachtwoord = `APP_DB_PASSWORD` uit `.env`
+(URL: `jdbc:postgresql://localhost:5432/musiccollection`). De tabellen staan onder *schemas → public*.
+
+Het schema wordt beheerd door Flyway (`backend/src/main/resources/db/migration`) en bij het starten van de
+backend gecontroleerd: kijken en query's draaien kan veilig, maar wijzig geen tabellen met de hand. Zet bij
+twijfel **Read-only** aan in de datasource-opties.
+
+**Waar komt dit vandaan?** Poorten in `docker-compose.yml`, database en gebruikers in
+`docker/postgres/init/01-create-databases.sh` (draait alleen bij de allereerste start), wachtwoorden in
+`.env`, de verbinding van de backend in `backend/src/main/resources/application.yml`.
+
 ## Scannen met je telefoon
 
 De camera werkt in de browser alleen via HTTPS. Caddy maakt daarvoor een eigen, lokaal certificaat.
