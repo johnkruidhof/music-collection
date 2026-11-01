@@ -1,0 +1,30 @@
+@if (auth.isLoggedIn()) {
+  <h1>Welkom{{ me()?.displayName ? ', ' + me()?.displayName : '' }}</h1>
+  @if (me() === undefined) {
+    <p>Verbinding met de backend maken...</p>
+  } @else if (me() === null) {
+    <p class="error">De backend is niet bereikbaar.</p>
+  }
+  <div class="actions">
+    <a mat-flat-button routerLink="/toevoegen">
+      <mat-icon>qr_code_scanner</mat-icon> Barcode scannen
+    </a>
+    <a mat-stroked-button routerLink="/collectie">
+      <mat-icon>library_music</mat-icon> Mijn collectie
+    </a>
+  </div>
+} @else {
+  <mat-card appearance="outlined" class="intro">
+    <mat-card-content>
+      <h1>Je muziekcollectie op één plek</h1>
+      <p>
+        Scan de barcode van je vinyl, cd's, dvd's en blu-rays en de gegevens worden automatisch
+        opgehaald: artiest, titel, tracks, jaartal en cover.
+      </p>
+      <div class="actions">
+        <button mat-flat-button (click)="auth.login()">Inloggen</button>
+        <button mat-stroked-button (click)="auth.register()">Account aanmaken</button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+}

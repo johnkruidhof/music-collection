@@ -24,60 +24,8 @@ import { MediaTypePipe, SourcePipe } from '../../shared/label.pipes';
     MatInputModule,
     MatRadioModule,
   ],
-  template: `
-    <h2 mat-dialog-title>Samenvoegen</h2>
-    <mat-dialog-content>
-      <p>
-        <strong>{{ source.artist }} – {{ source.title }}</strong>
-        ({{ source.collectionCount }} in collecties, {{ source.wishlistCount }} op verlanglijsten)
-        gaat op in de release die je hieronder kiest en wordt daarna verwijderd.
-      </p>
-      <form (submit)="$event.preventDefault(); search()">
-        <mat-form-field appearance="outline" class="full">
-          <mat-label>Zoek de juiste release</mat-label>
-          <input matInput [formControl]="query" autocomplete="off" />
-          <button matSuffix mat-icon-button type="submit" aria-label="Zoeken">
-            <mat-icon>search</mat-icon>
-          </button>
-        </mat-form-field>
-      </form>
-      <mat-radio-group class="results" [value]="target()" (change)="target.set($event.value)">
-        @for (release of results(); track release.id) {
-          <mat-radio-button [value]="release">
-            {{ release.artist }} – {{ release.title }}
-            <span class="meta">
-              · {{ release.mediaType | mediaType
-              }}{{ release.releaseYear ? ' · ' + release.releaseYear : '' }} ·
-              {{ release.source | source }} · {{ release.collectionCount }} in collecties
-            </span>
-          </mat-radio-button>
-        } @empty {
-          @if (searched()) {
-            <p>Geen andere releases gevonden.</p>
-          }
-        }
-      </mat-radio-group>
-    </mat-dialog-content>
-    <mat-dialog-actions align="end">
-      <button mat-button type="button" mat-dialog-close>Annuleren</button>
-      <button mat-flat-button type="button" [disabled]="!target()" (click)="confirm()">
-        Samenvoegen
-      </button>
-    </mat-dialog-actions>
-  `,
-  styles: `
-    .full {
-      width: 100%;
-    }
-    .results {
-      display: grid;
-      gap: 4px;
-    }
-    .meta {
-      color: var(--mat-sys-on-surface-variant);
-      font-size: 0.85rem;
-    }
-  `,
+  templateUrl: './merge-dialog.html',
+  styleUrl: './merge-dialog.scss',
 })
 export class MergeDialog {
   protected readonly source = inject<AdminRelease>(MAT_DIALOG_DATA);

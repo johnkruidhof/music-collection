@@ -1,0 +1,33 @@
+section {
+  margin-bottom: 32px;
+  max-width: 720px;
+}
+h2 {
+  font-size: 1.15rem;
+}
+.job {
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--mat-sys-surface-container-low);
+  display: grid;
+  gap: 12px;
+}
+.job-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+.counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.errors {
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.9rem;
+}

@@ -1,0 +1,89 @@
+<div class="layout">
+  <section class="scanner">
+    <app-barcode-scanner [active]="state().kind === 'scanning'" (scanned)="onScanned($event)" />
+
+    <form class="manual" (submit)="$event.preventDefault(); lookupManual()">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Barcode handmatig invoeren</mat-label>
+        <input matInput [formControl]="manualBarcode" inputmode="numeric" autocomplete="off" />
+        @if (manualBarcode.touched && manualBarcode.invalid) {
+          <mat-error>8 tot 14 cijfers</mat-error>
+        }
+      </mat-form-field>
+      <button mat-stroked-button type="submit"><mat-icon>search</mat-icon> Opzoeken</button>
+    </form>
+
+    @if (addedCount() > 0) {
+      <p class="counter">
+        <mat-icon>library_add_check</mat-icon>
+        {{ addedCount() }} {{ addedCount() === 1 ? 'release' : 'releases' }} toegevoegd in deze
+        sessie
+      </p>
+    }
+  </section>
+
+  <section class="result" aria-live="polite">
+    @switch (state().kind) {
+      @case ('scanning') {
+        <p class="hint">Richt de camera op de barcode van een plaat, cd, dvd of blu-ray.</p>
+      }
+      @case ('lookup') {
+        <p>
+          Barcode <strong>{{ barcode() }}</strong> opzoeken…
+        </p>
+        <mat-progress-bar mode="indeterminate" />
+      }
+      @case ('candidates') {
+        <h2>
+          {{
+            candidates().length === 1
+              ? 'Gevonden'
+              : candidates().length + ' persingen gevonden — kies de juiste'
+          }}
+        </h2>
+        <div class="candidates">
+          @for (candidate of candidates(); track candidate.source + candidate.externalId) {
+            <app-candidate-card
+              [candidate]="candidate"
+              [wishable]="true"
+              [wishBusy]="wishlist.isBusy(candidate)"
+              [wishedLocally]="wishlist.isWished(candidate)"
+              (wish)="wishlist.add($event)"
+              [busy]="adding() === candidate"
+              (add)="add($event)"
+            />
+          }
+        </div>
+        <button mat-button type="button" (click)="rescan()">
+          <mat-icon>qr_code_scanner</mat-icon> Niet de goede — opnieuw scannen
+        </button>
+      }
+      @case ('not-found') {
+        <h2>Niets gevonden voor {{ barcode() }}</h2>
+        <p>
+          Deze barcode staat niet in Discogs of MusicBrainz. Zoek op artiest en titel, of voer de
+          release zelf in.
+        </p>
+        <div class="actions">
+          <a mat-flat-button routerLink="../zoeken" [queryParams]="{ barcode: barcode() }">
+            <mat-icon>search</mat-icon> Zoeken
+          </a>
+          <a mat-stroked-button routerLink="../handmatig" [queryParams]="{ barcode: barcode() }">
+            <mat-icon>edit</mat-icon> Handmatig invoeren
+          </a>
+          <button mat-button type="button" (click)="rescan()">Opnieuw scannen</button>
+        </div>
+      }
+      @case ('error') {
+        <h2>Opzoeken mislukt</h2>
+        <p class="error">{{ errorText() }}</p>
+        <div class="actions">
+          <button mat-flat-button type="button" (click)="lookup(barcode())">
+            <mat-icon>refresh</mat-icon> Opnieuw proberen
+          </button>
+          <button mat-button type="button" (click)="rescan()">Opnieuw scannen</button>
+        </div>
+      }
+    }
+  </section>
+</div>

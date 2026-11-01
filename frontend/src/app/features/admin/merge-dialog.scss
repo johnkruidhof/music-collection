@@ -1,0 +1,11 @@
+.full {
+  width: 100%;
+}
+.results {
+  display: grid;
+  gap: 4px;
+}
+.meta {
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.85rem;
+}

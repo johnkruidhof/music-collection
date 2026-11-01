@@ -1,0 +1,63 @@
+.form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 12px;
+  align-items: flex-start;
+}
+.form mat-form-field {
+  flex: 1 1 220px;
+}
+.form .narrow {
+  flex: 0 1 160px;
+}
+.submit {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1 1 100%;
+  margin-bottom: 16px;
+}
+.notice {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+}
+.candidates {
+  display: grid;
+  gap: 12px;
+}
+.count {
+  color: var(--mat-sys-on-surface-variant);
+}
+.tracks {
+  margin: -4px 0 4px;
+  padding: 8px 16px;
+  border-radius: 0 0 12px 12px;
+  background: var(--mat-sys-surface-container);
+}
+.tracks ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.tracks li {
+  display: grid;
+  grid-template-columns: 3.5em 1fr auto;
+  gap: 8px;
+  padding: 2px 0;
+}
+.pos,
+.dur {
+  color: var(--mat-sys-on-surface-variant);
+  font-variant-numeric: tabular-nums;
+}
+.error {
+  color: var(--mat-sys-error);
+}
+.manual {
+  margin-top: 24px;
+}

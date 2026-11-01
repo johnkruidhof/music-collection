@@ -1,0 +1,12 @@
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+}
+.intro {
+  max-width: 640px;
+}
+.error {
+  color: var(--mat-sys-error);
+}

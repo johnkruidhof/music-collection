@@ -1,0 +1,57 @@
+<h1>Statistieken</h1>
+
+@if (error()) {
+  <p class="error">{{ error() }}</p>
+} @else if (stats(); as s) {
+  @if (s.totalItems === 0) {
+    <div class="empty">
+      <p>Nog geen statistieken: je collectie is leeg.</p>
+      <a mat-flat-button routerLink="/toevoegen"><mat-icon>add</mat-icon> Releases toevoegen</a>
+    </div>
+  } @else {
+    <section class="tiles" aria-label="Kerncijfers">
+      <div class="tile">
+        <span class="tile-label">Releases</span>
+        <span class="tile-value">{{ s.totalItems | number: '1.0-0' : 'nl' }}</span>
+      </div>
+      <div class="tile">
+        <span class="tile-label">Aankoopwaarde</span>
+        <span class="tile-value">{{
+          s.totalValue | currency: 'EUR' : 'symbol' : '1.0-0' : 'nl'
+        }}</span>
+        <span class="tile-hint">
+          {{ s.itemsWithPrice }} van {{ s.totalItems }} met aankoopprijs
+        </span>
+      </div>
+      @if (s.itemsWithPrice > 0) {
+        <div class="tile">
+          <span class="tile-label">Gemiddelde prijs</span>
+          <span class="tile-value">
+            {{ s.totalValue / s.itemsWithPrice | currency: 'EUR' : 'symbol' : '1.2-2' : 'nl' }}
+          </span>
+        </div>
+      }
+    </section>
+
+    <div class="charts">
+      <section>
+        <h2>Per type</h2>
+        <app-bar-list [rows]="byType()" label="Aantal releases per type" />
+      </section>
+      <section>
+        <h2>Per decennium</h2>
+        <app-bar-list [rows]="byDecade()" label="Aantal releases per decennium" />
+      </section>
+      <section>
+        <h2>Meest verzamelde artiesten</h2>
+        <app-bar-list [rows]="topArtists()" label="Top-artiesten op aantal releases" />
+      </section>
+      <section>
+        <h2>Staat van plaat/disc</h2>
+        <app-bar-list [rows]="byCondition()" label="Aantal releases per staat" />
+      </section>
+    </div>
+  }
+} @else {
+  <mat-progress-bar mode="indeterminate" />
+}
