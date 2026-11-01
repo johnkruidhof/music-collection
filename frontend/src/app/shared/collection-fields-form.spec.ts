@@ -13,6 +13,7 @@ describe('collection fields form', () => {
       purchaseLocation: null,
       storageLocation: 'Kast A',
       notes: null,
+      genreId: null,
     });
   });
 
@@ -25,6 +26,7 @@ describe('collection fields form', () => {
       purchaseLocation: null,
       storageLocation: null,
       notes: null,
+      genreId: 'g1',
     });
 
     expect(form.controls.purchasePrice.value).toBe('12,5');

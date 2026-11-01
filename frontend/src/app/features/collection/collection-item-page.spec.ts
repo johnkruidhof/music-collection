@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { GenreStore } from '../../shared/genre-store';
 import { Router, provideRouter } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -56,6 +57,9 @@ const item = (overrides: Partial<Release> = {}): CollectionItem => ({
   purchaseLocation: null,
   storageLocation: 'Kast A',
   notes: null,
+  genreId: null,
+  genreName: 'Rock',
+  subgenreName: null,
   addedAt: '2026-10-31T12:00:00Z',
   updatedAt: '2026-10-31T12:00:00Z',
 });
@@ -96,6 +100,15 @@ describe('CollectionItemPage', () => {
       providers: [
         provideRouter([{ path: 'collectie', children: [] }]),
         { provide: CollectionApiService, useValue: collectionApi },
+        {
+          provide: GenreStore,
+          useValue: {
+            ensureLoaded: () => undefined,
+            options: () => [],
+            genres: () => [],
+            matches: () => true,
+          },
+        },
         { provide: MatSnackBar, useValue: snackBar },
         { provide: MatDialog, useValue: dialog },
       ],

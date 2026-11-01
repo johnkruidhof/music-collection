@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { GenreStore } from '../../../shared/genre-store';
 import { Router, provideRouter } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { of } from 'rxjs';
@@ -31,6 +32,15 @@ describe('ManualReleasePage', () => {
           { path: 'collectie/:id', children: [] },
         ]),
         { provide: CollectionApiService, useValue: collectionApi },
+        {
+          provide: GenreStore,
+          useValue: {
+            ensureLoaded: () => undefined,
+            options: () => [],
+            genres: () => [],
+            matches: () => true,
+          },
+        },
         { provide: MatSnackBar, useValue: snackBar },
       ],
     }).compileComponents();

@@ -23,6 +23,10 @@ export class WishlistApiService {
     });
   }
 
+  setGenre(id: string, genreId: string | null): Observable<WishlistItem> {
+    return this.http.put<WishlistItem>(`/api/wishlist/${id}/genre`, { genreId });
+  }
+
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`/api/wishlist/${id}`);
   }
