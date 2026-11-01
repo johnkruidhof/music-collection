@@ -251,6 +251,10 @@ src/app/
     └── add/           # scan-flow, zoek-flow, handmatig formulier
 ```
 
+Elke component heeft zijn template en styles in aparte bestanden naast de `.ts`
+(`naam.ts` + `naam.html` + `naam.scss`, via `templateUrl`/`styleUrl`); inline `template`/`styles` faalt in
+`npm run lint` (uitgezonderd test-stubs in `*.spec.ts`).
+
 Routes: `/` (home), `/collectie`, `/toevoegen` — de laatste twee achter `authGuard`.
 `/toevoegen` heeft tabs als child-routes: `scannen`, `zoeken`, `luisteren`, `handmatig` (query-param `barcode`
 vult het zoek-/handmatig-formulier voor na een mislukte scan).
@@ -326,6 +330,7 @@ npm run format                 # Prettier; format:check doet hetzelfde zonder te
   `@MockitoBean JwtDecoder` en `jwt()` uit spring-security-test (zie `UserControllerTest`).
 - Houd de package-regels uit §4.2 strikt aan.
 - UI-teksten in het Nederlands.
+- Angular-componenten: template en styles altijd in aparte `.html`/`.scss`-bestanden (zie §6).
 - Update deze CLAUDE.md wanneer architectuurkeuzes wijzigen.
 
 ---
@@ -451,6 +456,9 @@ npm run format                 # Prettier; format:check doet hetzelfde zonder te
   — `POST /api/recognize?scope=collection`: geen zoekactie bij Discogs/MusicBrainz, wel `trackMatches`
   (positie/disc van het nummer op het eigen item; items met de track eerst). Frontend `/collectie/luisteren`
   (zelfde `ListenPage`, route-data `mode: 'collection'`) met track en opslaglocatie; knop op het overzicht.
+- [x] **F-33** Frontend: templates en styles als aparte `.html`- en `.scss`-bestanden naast de `.ts`
+  — 16 componenten omgezet; ESLint dwingt het af met `@angular-eslint/component-max-inline-declarations`
+  (template/styles/animations 0; uitgezonderd `*.spec.ts` voor test-stubs).
 
 ### Fase 4 — Publiek online (samen met de gebruiker uitwerken)
 - [ ] **F-40** Hardening: Keycloak `start` (productie) met echte hostname, redirect-URI's en webOrigins

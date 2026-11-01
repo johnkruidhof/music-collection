@@ -20,57 +20,8 @@ import type { IScannerControls } from '@zxing/browser';
 @Component({
   selector: 'app-barcode-scanner',
   imports: [MatIconModule],
-  template: `
-    <div class="viewport" [class.paused]="!active()">
-      <video #video playsinline muted aria-label="Camerabeeld"></video>
-      <div class="frame" aria-hidden="true"></div>
-      @if (error()) {
-        <div class="message error">
-          <mat-icon>videocam_off</mat-icon>
-          <span>{{ error() }}</span>
-        </div>
-      } @else if (starting()) {
-        <div class="message">Camera starten…</div>
-      }
-    </div>
-  `,
-  styles: `
-    .viewport {
-      position: relative;
-      width: 100%;
-      max-width: 640px;
-      aspect-ratio: 4 / 3;
-      border-radius: 12px;
-      overflow: hidden;
-      background: #000;
-    }
-    video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-    .frame {
-      position: absolute;
-      inset: 30% 10%;
-      border: 3px solid rgb(255 255 255 / 80%);
-      border-radius: 8px;
-      box-shadow: 0 0 0 100vmax rgb(0 0 0 / 30%);
-    }
-    .paused .frame {
-      border-color: rgb(255 255 255 / 30%);
-    }
-    .message {
-      position: absolute;
-      inset: auto 0 0 0;
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      padding: 12px;
-      color: #fff;
-      background: rgb(0 0 0 / 60%);
-    }
-  `,
+  templateUrl: './barcode-scanner.html',
+  styleUrl: './barcode-scanner.scss',
 })
 export class BarcodeScanner {
   /** Alleen als {@code true} worden herkende codes doorgegeven. */

@@ -7,35 +7,8 @@ import { MatTabsModule } from '@angular/material/tabs';
 @Component({
   selector: 'app-add-page',
   imports: [RouterOutlet, RouterLink, RouterLinkActive, MatTabsModule, MatIconModule],
-  template: `
-    <h1>Toevoegen</h1>
-    <nav mat-tab-nav-bar [tabPanel]="panel" aria-label="Manier van toevoegen">
-      @for (tab of tabs; track tab.path) {
-        <a
-          mat-tab-link
-          [routerLink]="tab.path"
-          queryParamsHandling="preserve"
-          routerLinkActive
-          #rla="routerLinkActive"
-          [active]="rla.isActive"
-        >
-          <mat-icon>{{ tab.icon }}</mat-icon>
-          <span class="label">{{ tab.label }}</span>
-        </a>
-      }
-    </nav>
-    <mat-tab-nav-panel #panel>
-      <div class="panel"><router-outlet /></div>
-    </mat-tab-nav-panel>
-  `,
-  styles: `
-    .label {
-      margin-left: 8px;
-    }
-    .panel {
-      padding-top: 24px;
-    }
-  `,
+  templateUrl: './add-page.html',
+  styleUrl: './add-page.scss',
 })
 export class AddPage {
   protected readonly tabs = [

@@ -1,0 +1,42 @@
+.layout {
+  display: grid;
+  gap: 24px;
+}
+@media (min-width: 960px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+  }
+}
+.manual {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 16px;
+  max-width: 640px;
+}
+.manual mat-form-field {
+  flex: 1;
+}
+.counter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--mat-sys-primary);
+}
+.candidates {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.hint {
+  color: var(--mat-sys-on-surface-variant);
+}
+.error {
+  color: var(--mat-sys-error);
+}

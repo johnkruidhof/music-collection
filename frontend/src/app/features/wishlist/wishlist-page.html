@@ -1,0 +1,57 @@
+<header class="header">
+  <h1>
+    Verlanglijst
+    @if (items(); as list) {
+      <span class="count">({{ list.length }})</span>
+    }
+  </h1>
+  <a mat-stroked-button routerLink="/toevoegen/zoeken"><mat-icon>search</mat-icon> Zoeken</a>
+</header>
+
+@if (error()) {
+  <p class="error">{{ error() }}</p>
+} @else if (items(); as list) {
+  @if (list.length === 0) {
+    <div class="empty">
+      <mat-icon>bookmark_border</mat-icon>
+      <p>Je verlanglijst is leeg. Zoek of scan een release en kies "Op verlanglijst".</p>
+    </div>
+  } @else {
+    <ul class="list">
+      @for (item of list; track item.id) {
+        <li class="item">
+          <app-cover class="cover" [url]="item.coverThumbnailUrl" [alt]="item.title" />
+          <div class="info">
+            <span class="artist">{{ item.artist }}</span>
+            <span class="title">{{ item.title }}</span>
+            <span class="meta">
+              {{ item.mediaType | mediaType }}{{ item.releaseYear ? ' · ' + item.releaseYear : ''
+              }}{{ item.country ? ' · ' + item.country : '' }}
+            </span>
+            @if (item.formatDetails) {
+              <span class="meta">{{ item.formatDetails }}</span>
+            }
+            @if (item.notes) {
+              <span class="notes">{{ item.notes }}</span>
+            }
+          </div>
+          <div class="actions">
+            <button
+              mat-flat-button
+              type="button"
+              [disabled]="busy() === item.id"
+              (click)="acquire(item)"
+            >
+              <mat-icon>shopping_bag</mat-icon> Gekocht
+            </button>
+            <button mat-button type="button" [disabled]="busy() === item.id" (click)="remove(item)">
+              <mat-icon>delete</mat-icon> Weghalen
+            </button>
+          </div>
+        </li>
+      }
+    </ul>
+  }
+} @else {
+  <mat-progress-bar mode="indeterminate" />
+}

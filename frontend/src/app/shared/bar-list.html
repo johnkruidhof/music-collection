@@ -1,0 +1,11 @@
+<ul class="bars" [attr.aria-label]="label()">
+  @for (row of rows(); track row.label) {
+    <li class="row" [attr.title]="row.label + ': ' + format()(row.value)">
+      <span class="label">{{ row.label }}</span>
+      <span class="track">
+        <span class="bar" [style.width.%]="percentage(row.value)"></span>
+        <span class="value">{{ format()(row.value) }}</span>
+      </span>
+    </li>
+  }
+</ul>

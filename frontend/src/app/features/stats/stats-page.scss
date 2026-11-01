@@ -1,0 +1,45 @@
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+.tile {
+  display: grid;
+  gap: 4px;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--mat-sys-surface-container-low);
+}
+.tile-label,
+.tile-hint {
+  color: var(--mat-sys-on-surface-variant);
+}
+.tile-hint {
+  font-size: 0.85rem;
+}
+.tile-value {
+  font-size: 2rem;
+  font-weight: 600;
+}
+.charts {
+  display: grid;
+  gap: 32px 48px;
+}
+@media (min-width: 960px) {
+  .charts {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+h2 {
+  font-size: 1.1rem;
+  margin: 0 0 12px;
+}
+.empty {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+}
+.error {
+  color: var(--mat-sys-error);
+}

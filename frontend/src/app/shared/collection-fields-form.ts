@@ -71,62 +71,8 @@ export function collectionFieldsValue(form: CollectionFieldsForm): CollectionIte
     MatSelectModule,
     ConditionPipe,
   ],
-  template: `
-    <div class="grid" [formGroup]="form()">
-      <mat-form-field appearance="outline">
-        <mat-label>Staat plaat/disc</mat-label>
-        <mat-select formControlName="conditionMedia">
-          <mat-option [value]="null">Onbekend</mat-option>
-          @for (condition of conditions; track condition) {
-            <mat-option [value]="condition">{{ condition | condition }}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field appearance="outline">
-        <mat-label>Staat hoes</mat-label>
-        <mat-select formControlName="conditionSleeve">
-          <mat-option [value]="null">Onbekend</mat-option>
-          @for (condition of conditions; track condition) {
-            <mat-option [value]="condition">{{ condition | condition }}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field appearance="outline">
-        <mat-label>Aankoopdatum</mat-label>
-        <input matInput type="date" formControlName="purchaseDate" [max]="today" />
-      </mat-form-field>
-      <mat-form-field appearance="outline">
-        <mat-label>Aankoopprijs</mat-label>
-        <span matTextPrefix>€&nbsp;</span>
-        <input matInput formControlName="purchasePrice" inputmode="decimal" autocomplete="off" />
-        @if (form().controls.purchasePrice.invalid) {
-          <mat-error>Bijvoorbeeld 24,99</mat-error>
-        }
-      </mat-form-field>
-      <mat-form-field appearance="outline">
-        <mat-label>Gekocht bij</mat-label>
-        <input matInput formControlName="purchaseLocation" />
-      </mat-form-field>
-      <mat-form-field appearance="outline">
-        <mat-label>Opslaglocatie</mat-label>
-        <input matInput formControlName="storageLocation" placeholder="bv. Kast A, plank 2" />
-      </mat-form-field>
-      <mat-form-field appearance="outline" class="wide">
-        <mat-label>Notities</mat-label>
-        <textarea matInput formControlName="notes" rows="3"></textarea>
-      </mat-form-field>
-    </div>
-  `,
-  styles: `
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 0 12px;
-    }
-    .wide {
-      grid-column: 1 / -1;
-    }
-  `,
+  templateUrl: './collection-fields-form.html',
+  styleUrl: './collection-fields-form.scss',
 })
 export class CollectionFieldsFormComponent {
   readonly form = input.required<CollectionFieldsForm>();

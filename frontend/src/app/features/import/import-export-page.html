@@ -1,0 +1,74 @@
+<a mat-button routerLink="/collectie"><mat-icon>arrow_back</mat-icon> Collectie</a>
+<h1>Importeren en exporteren</h1>
+
+<section>
+  <h2>Exporteren</h2>
+  <p>Download je hele collectie als CSV-bestand (opent in Excel of Numbers).</p>
+  <button mat-stroked-button type="button" [disabled]="exporting()" (click)="export()">
+    <mat-icon>download</mat-icon> Collectie exporteren
+  </button>
+</section>
+
+<section>
+  <h2>Importeren uit Discogs</h2>
+  <p>
+    Exporteer op Discogs je collectie (<em>Collection → Export</em>) en kies hier het CSV-bestand.
+    De gegevens worden per release bij Discogs opgehaald; dat duurt ongeveer een seconde per
+    release. Opnieuw importeren is veilig: releases die je al hebt worden overgeslagen.
+  </p>
+  <input #fileInput type="file" accept=".csv,text/csv" hidden (change)="onFileSelected($event)" />
+  <button
+    mat-flat-button
+    type="button"
+    [disabled]="running() || uploading()"
+    (click)="fileInput.click()"
+  >
+    <mat-icon>upload_file</mat-icon> Discogs-export kiezen
+  </button>
+
+  @if (job(); as j) {
+    <div class="job" aria-live="polite">
+      <div class="job-title">
+        @switch (j.status) {
+          @case ('RUNNING') {
+            Bezig met importeren… {{ j.processed }} van {{ j.total }}
+          }
+          @case ('FINISHED') {
+            <mat-icon>check_circle</mat-icon> Import klaar
+          }
+          @case ('FAILED') {
+            <mat-icon>error</mat-icon> Import afgebroken
+          }
+        }
+      </div>
+      <mat-progress-bar
+        [mode]="j.status === 'RUNNING' && j.processed === 0 ? 'indeterminate' : 'determinate'"
+        [value]="progress()"
+      />
+      <ul class="counts">
+        <li>
+          <strong>{{ j.imported | number }}</strong> toegevoegd
+        </li>
+        <li>
+          <strong>{{ j.skipped | number }}</strong> stonden al in je collectie
+        </li>
+        <li>
+          <strong>{{ j.failed | number }}</strong> mislukt
+        </li>
+      </ul>
+      @if (j.errors.length > 0) {
+        <details>
+          <summary>Mislukte regels ({{ j.errors.length }})</summary>
+          <ul class="errors">
+            @for (error of j.errors; track $index) {
+              <li>{{ error }}</li>
+            }
+          </ul>
+        </details>
+      }
+      @if (j.status !== 'RUNNING' && j.imported > 0) {
+        <a mat-button routerLink="/collectie">Naar je collectie</a>
+      }
+    </div>
+  }
+</section>

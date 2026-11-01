@@ -1,0 +1,12 @@
+<div class="viewport" [class.paused]="!active()">
+  <video #video playsinline muted aria-label="Camerabeeld"></video>
+  <div class="frame" aria-hidden="true"></div>
+  @if (error()) {
+    <div class="message error">
+      <mat-icon>videocam_off</mat-icon>
+      <span>{{ error() }}</span>
+    </div>
+  } @else if (starting()) {
+    <div class="message">Camera starten…</div>
+  }
+</div>

@@ -1,0 +1,78 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.hint,
+.count,
+.meta {
+  color: var(--mat-sys-on-surface-variant);
+}
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.search {
+  flex: 1 1 280px;
+}
+.source {
+  flex: 0 1 200px;
+}
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.row {
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  grid-template-areas: 'thumb info usage' 'thumb actions actions';
+  gap: 4px 16px;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+}
+.thumb {
+  grid-area: thumb;
+  width: 48px;
+  align-self: start;
+}
+.info {
+  grid-area: info;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.title {
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.meta {
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+.usage {
+  grid-area: usage;
+  text-align: right;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+.usage.unused {
+  color: var(--mat-sys-tertiary);
+}
+.actions {
+  grid-area: actions;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.delete {
+  color: var(--mat-sys-error);
+}
+.error {
+  color: var(--mat-sys-error);
+}

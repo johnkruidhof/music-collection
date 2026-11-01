@@ -1,0 +1,13 @@
+@if (showImage()) {
+  <img
+    [src]="url()"
+    [alt]="alt()"
+    loading="lazy"
+    referrerpolicy="no-referrer"
+    (error)="failedUrl.set(url())"
+  />
+} @else {
+  <div class="placeholder" role="img" [attr.aria-label]="alt() || 'Geen cover'">
+    <mat-icon>album</mat-icon>
+  </div>
+}
