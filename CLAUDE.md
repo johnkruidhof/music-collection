@@ -142,8 +142,10 @@ release          id, barcode, artist, title, release_year, media_type, format_de
                  cover_cache_attempts, source, discogs_id (uniek), musicbrainz_id (uniek), created_at, updated_at
 track            id, release_id, disc_number, position ("A1"), sort_order, title, duration_seconds, artist
 collection_item  id, user_id, release_id, condition_media, condition_sleeve, purchase_date,
-                 purchase_price, purchase_location, storage_location, notes, added_at, updated_at
-wishlist_item    id, user_id, release_id (uniek per user+release), notes, added_at   — verlanglijst (V4)
+                 purchase_price, purchase_location, storage_location, notes, genre_id, added_at, updated_at
+wishlist_item    id, user_id, release_id (uniek per user+release), notes, genre_id, added_at   — verlanglijst (V4)
+genre            id, user_id, parent_id (subgenre), name, path (uniek per user), created_at  — eigen genres (V5)
+artist_genre     id, user_id, artist_key (genormaliseerd, uniek per user), genre_id — genre-voorstel (V5)
 cover_image      id, release_id (uniek, ON DELETE CASCADE), image, thumbnail (bytea, JPEG), content_type,
                  created_at        — eigen uploads (MANUAL, V2) én lokaal gecachte externe covers (F-21)
 ```
@@ -180,7 +182,7 @@ GET    /api/lookup/barcode/{barcode}             kandidaten uit lokale catalogus
 GET    /api/lookup/search?artist=&title=&year=&mediaType=   zoeken zonder barcode                ✔
 GET    /api/lookup/{source}/{externalId}         volledige details (incl. tracks) van één kandidaat   ✔
 
-GET    /api/collection?q=&mediaType=&sort=&page=&size=   eigen collectie (gepagineerd)        ✔
+GET    /api/collection?q=&mediaType=&genre=&sort=&page=&size=   eigen collectie (gepagineerd)        ✔
 POST   /api/collection                           toevoegen: { source, externalId } óf { release }, + fields   ✔
 GET    /api/collection/{id}                                                                      ✔
 PUT    /api/collection/{id}                      eigen velden wijzigen (staat, locatie, notities…)   ✔
@@ -193,6 +195,12 @@ GET    /api/collection/export                    CSV-export van de eigen collect
 POST   /api/collection/import/discogs            Discogs-collectie-CSV importeren (202 + taak)          ✔
 GET    /api/collection/import/{jobId} | /latest  voortgang van een import                            ✔
 
+GET    /api/genres                               eigen genres met subgenres (eerste keer: standaardlijst)   ✔
+POST   /api/genres                               { name, parentId? }                                    ✔
+PUT    /api/genres/{id}                          hernoemen                                              ✔
+DELETE /api/genres/{id}                          (subgenres mee; items/wensen houden geen genre)          ✔
+POST   /api/genres/import                        boomstructuur (multipart `file`) → genres + artiesten + indelen  ✔
+PUT    /api/wishlist/{id}/genre                  { genreId }                                            ✔
 GET    /api/wishlist                             verlanglijst                                          ✔
 POST   /api/wishlist                             { source, externalId, notes } (idempotent)            ✔
 DELETE /api/wishlist/{id}                                                                        ✔
@@ -434,6 +442,14 @@ npm run format                 # Prettier; format:check doet hetzelfde zonder te
   — `/api/admin/releases` (rol `admin`): zoeken met gebruik per release, ongebruikte verwijderen/opruimen,
   samenvoegen (items + wensen verhuizen, dubbele wens vervalt, bron weg). Frontend `/beheer` met
   `adminGuard` (rollen uit `/api/me` via `CurrentUserService`); menu-item alleen voor admins.
+- [x] **F-28** Genres (backend): eigen genres per gebruiker met optioneel subgenre, toegekend aan items en wensen
+  — V5 `genre` (path = sorteersleutel, uniek per gebruiker), `artist_genre` (artiest → genre: voorstel bij
+  toevoegen, geleerd van eigen keuze of uit een geïmporteerde boomstructuur), `genre_id` op items/wensen.
+  Standaardlijst `resources/genres/standaard-genres.txt` (eenmalig per gebruiker). `GenreTree` herkent
+  subgenres aan de structuur (artiesten zonder jaartal, titels met jaartal eronder). Filter `genre=<id>|none`
+  (incl. subgenres), sortering `genre`, stats `byGenre`, CSV-kolommen Genre/Subgenre, Discogs-import via artiest.
+- [ ] **F-29** Genres (frontend): filter/groeperen in overzicht, genre op detail/handmatig/verlanglijst,
+  statistiek per genre, genres beheren en boomstructuur importeren
 
 ### Fase 3 — Audio-herkenning ("luisteren")
 - [x] **F-30** Onderzoek & proof of concept audioherkenning

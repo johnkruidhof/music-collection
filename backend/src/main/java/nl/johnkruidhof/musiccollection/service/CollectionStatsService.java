@@ -36,6 +36,7 @@ public class CollectionStatsService {
                 statsRepository.topArtists(userId, PageRequest.of(0, CollectionStatsDto.TOP_ARTISTS)),
                 statsRepository.countByCondition(userId).stream()
                         .sorted(BY_GOLDMINE_SCALE)
-                        .toList());
+                        .toList(),
+                statsRepository.countByGenre(userId));
     }
 }

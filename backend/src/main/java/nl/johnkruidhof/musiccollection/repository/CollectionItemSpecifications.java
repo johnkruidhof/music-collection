@@ -25,6 +25,23 @@ public final class CollectionItemSpecifications {
         return (root, query, cb) -> mediaType == null ? null : cb.equal(root.get("release").get("mediaType"), mediaType);
     }
 
+    /** Genre inclusief zijn subgenres (F-28); {@code null} = geen filter. */
+    public static Specification<CollectionItem> hasGenre(UUID genreId) {
+        return (root, query, cb) -> {
+            if (genreId == null) {
+                return null;
+            }
+            var genre = root.join("genre", jakarta.persistence.criteria.JoinType.LEFT);
+            var parent = genre.join("parent", jakarta.persistence.criteria.JoinType.LEFT);
+            return cb.or(cb.equal(genre.get("id"), genreId), cb.equal(parent.get("id"), genreId));
+        };
+    }
+
+    /** Items zonder genre (F-28). */
+    public static Specification<CollectionItem> withoutGenre(boolean active) {
+        return (root, query, cb) -> active ? cb.isNull(root.get("genre")) : null;
+    }
+
     /** Hoofdletterongevoelig "bevat" op artiest of titel; leeg = geen filter. */
     public static Specification<CollectionItem> matchesText(String text) {
         return (root, query, cb) -> {

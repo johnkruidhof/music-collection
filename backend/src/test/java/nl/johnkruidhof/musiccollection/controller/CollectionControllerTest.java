@@ -57,10 +57,10 @@ class CollectionControllerTest {
 
     @Test
     void listPassesFiltersAndReturnsPage() throws Exception {
-        given(collectionService.list(any(), eq("radio"), eq(nl.johnkruidhof.musiccollection.entity.MediaType.VINYL),
+        given(collectionService.list(any(), eq("radio"), eq(nl.johnkruidhof.musiccollection.entity.MediaType.VINYL), org.mockito.ArgumentMatchers.isNull(),
                 eq("artist,desc"), eq(1), eq(12))).willReturn(new CollectionPageDto(List.of(new CollectionItemSummaryDto(
                 ID, UUID.randomUUID(), "Radiohead", "OK Computer", 1997,
-                nl.johnkruidhof.musiccollection.entity.MediaType.VINYL, "2×Vinyl", null, null, "Kast A",
+                nl.johnkruidhof.musiccollection.entity.MediaType.VINYL, "2×Vinyl", null, null, "Kast A", null, null, null,
                 Instant.parse("2026-10-31T12:00:00Z"))), 1, 12, 13, 2));
 
         mockMvc.perform(get("/api/collection").with(jwt()).param("q", "radio").param("mediaType", "VINYL")
@@ -127,7 +127,7 @@ class CollectionControllerTest {
         ReleaseDto release = new ReleaseDto(UUID.randomUUID(), null, "Radiohead", "OK Computer", 1997,
                 nl.johnkruidhof.musiccollection.entity.MediaType.VINYL, null, null, null, null, null, null,
                 MetadataSource.DISCOGS, "2149389", null, List.of());
-        return new CollectionItemDto(ID, release, MediaCondition.NEAR_MINT, null, null, null, null, "Kast A", null,
+        return new CollectionItemDto(ID, release, MediaCondition.NEAR_MINT, null, null, null, null, "Kast A", null, null, null, null,
                 Instant.now(), Instant.now());
     }
 }

@@ -22,5 +22,8 @@ public record WishlistItemDto(
         String discogsId,
         String musicbrainzId,
         String notes,
+        UUID genreId,
+        String genreName,
+        String subgenreName,
         Instant addedAt) {
 }

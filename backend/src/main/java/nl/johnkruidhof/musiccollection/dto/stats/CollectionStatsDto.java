@@ -21,7 +21,8 @@ public record CollectionStatsDto(
         List<MediaTypeCount> byMediaType,
         List<DecadeCount> byDecade,
         List<ArtistCount> topArtists,
-        List<ConditionCount> byCondition) {
+        List<ConditionCount> byCondition,
+        List<GenreCount> byGenre) {
 
     public static final int TOP_ARTISTS = 10;
 
@@ -32,6 +33,10 @@ public record CollectionStatsDto(
     }
 
     public record ArtistCount(String artist, long count) {
+    }
+
+    /** Per hoofdgenre (subgenres tellen mee); {@code genre} {@code null} = geen genre (F-28). */
+    public record GenreCount(String genre, long count) {
     }
 
     /** {@code condition} {@code null} = staat niet ingevuld. */

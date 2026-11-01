@@ -1,0 +1,25 @@
+# Standaardgenres voor nieuwe gebruikers (F-28). Subgenres springen in met twee spaties.
+Alternatieve rock
+Blues-Rock
+Electronica
+Fusion
+Gitaar
+Hardrock - Metal
+  AOR
+  Doom Metal
+  Grunge
+  Hardrock
+  Heavy Metal
+  Latin Rock
+  Progressive Death
+  Progressive Metal
+  Progressive Rock
+  Thrash Metal
+Jazz
+Klassiekers
+Nederlands
+Rock
+Singer Songwriter
+Soul - funk - R&B
+Soundtrack
+World - klassiek - folk

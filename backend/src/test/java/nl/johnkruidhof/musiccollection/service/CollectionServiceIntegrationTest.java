@@ -79,7 +79,7 @@ class CollectionServiceIntegrationTest {
 
         CollectionItemDto first = collectionService.add(ALICE, new AddToCollectionRequest(MetadataSource.DISCOGS,
                 "2149389", null, new CollectionItemFields(MediaCondition.NEAR_MINT, null, LocalDate.of(2024, 5, 1),
-                        new BigDecimal("29.99"), "Concerto", "Kast A", "Eerste persing?")));
+                        new BigDecimal("29.99"), "Concerto", "Kast A", "Eerste persing?", null)));
         CollectionItemDto second = collectionService.add(BOB,
                 new AddToCollectionRequest(MetadataSource.DISCOGS, "2149389", null, null));
 
@@ -124,7 +124,7 @@ class CollectionServiceIntegrationTest {
         CollectionItemDto alicesItem = addManual(ALICE, "Radiohead", "Kid A", MediaType.CD);
         addManual(BOB, "Bob Dylan", "Blonde on Blonde", MediaType.VINYL);
 
-        assertThat(collectionService.list(ALICE, null, null, null, 0, 24).content())
+        assertThat(collectionService.list(ALICE, null, null, null, null, 0, 24).content())
                 .extracting(CollectionItemSummaryDto::title).containsExactly("Kid A");
         // Andermans item bestaat voor jou niet: 404, geen 403.
         assertThatThrownBy(() -> collectionService.get(BOB, alicesItem.id())).isInstanceOf(ResourceNotFoundException.class);
@@ -140,16 +140,16 @@ class CollectionServiceIntegrationTest {
         addManual(ALICE, "Portishead", "Dummy", MediaType.VINYL);
         addManual(ALICE, "Björk", "100%_Pure", MediaType.CD);
 
-        assertThat(titles(collectionService.list(ALICE, "head", null, "title", 0, 24)))
+        assertThat(titles(collectionService.list(ALICE, "head", null, null, "title", 0, 24)))
                 .containsExactly("Dummy", "Kid A", "OK Computer");
-        assertThat(titles(collectionService.list(ALICE, "RADIO", MediaType.VINYL, null, 0, 24)))
+        assertThat(titles(collectionService.list(ALICE, "RADIO", MediaType.VINYL, null, null, 0, 24)))
                 .containsExactly("OK Computer");
         // % en _ zijn letterlijke tekens, geen wildcards.
-        assertThat(titles(collectionService.list(ALICE, "0%_", null, null, 0, 24))).containsExactly("100%_Pure");
-        assertThat(titles(collectionService.list(ALICE, null, null, "artist,desc", 0, 24)))
+        assertThat(titles(collectionService.list(ALICE, "0%_", null, null, null, 0, 24))).containsExactly("100%_Pure");
+        assertThat(titles(collectionService.list(ALICE, null, null, null, "artist,desc", 0, 24)))
                 .containsExactly("Kid A", "OK Computer", "Dummy", "100%_Pure");
 
-        CollectionPageDto page = collectionService.list(ALICE, null, null, "artist", 1, 3);
+        CollectionPageDto page = collectionService.list(ALICE, null, null, null, "artist", 1, 3);
         assertThat(page.totalElements()).isEqualTo(4);
         assertThat(page.totalPages()).isEqualTo(2);
         assertThat(titles(page)).containsExactly("OK Computer");
@@ -157,11 +157,11 @@ class CollectionServiceIntegrationTest {
 
     @Test
     void invalidSortOrPageIsRejected() {
-        assertThatThrownBy(() -> collectionService.list(ALICE, null, null, "user.id", 0, 24))
+        assertThatThrownBy(() -> collectionService.list(ALICE, null, null, null, "user.id", 0, 24))
                 .isInstanceOf(InvalidRequestException.class);
-        assertThatThrownBy(() -> collectionService.list(ALICE, null, null, "artist,sideways", 0, 24))
+        assertThatThrownBy(() -> collectionService.list(ALICE, null, null, null, "artist,sideways", 0, 24))
                 .isInstanceOf(InvalidRequestException.class);
-        assertThatThrownBy(() -> collectionService.list(ALICE, null, null, null, 0, 500))
+        assertThatThrownBy(() -> collectionService.list(ALICE, null, null, null, null, 0, 500))
                 .isInstanceOf(InvalidRequestException.class);
     }
 
@@ -169,10 +169,10 @@ class CollectionServiceIntegrationTest {
     void updateOverwritesPersonalFields() {
         CollectionItemDto item = collectionService.add(ALICE, new AddToCollectionRequest(null, null,
                 manual("Radiohead", "Kid A", MediaType.CD),
-                new CollectionItemFields(MediaCondition.GOOD, null, null, null, null, "Zolder", "oud")));
+                new CollectionItemFields(MediaCondition.GOOD, null, null, null, null, "Zolder", "oud", null)));
 
         CollectionItemDto updated = collectionService.update(ALICE, item.id(), new CollectionItemFields(
-                MediaCondition.VERY_GOOD_PLUS, MediaCondition.GOOD, null, null, null, "Kast B", null));
+                MediaCondition.VERY_GOOD_PLUS, MediaCondition.GOOD, null, null, null, "Kast B", null, null));
 
         assertThat(updated.conditionMedia()).isEqualTo(MediaCondition.VERY_GOOD_PLUS);
         assertThat(updated.storageLocation()).isEqualTo("Kast B");

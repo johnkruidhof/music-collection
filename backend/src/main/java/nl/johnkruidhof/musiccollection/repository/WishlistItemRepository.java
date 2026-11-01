@@ -14,16 +14,19 @@ import nl.johnkruidhof.musiccollection.entity.WishlistItem;
 /** Altijd gescoped op de eigenaar. */
 public interface WishlistItemRepository extends JpaRepository<WishlistItem, UUID> {
 
-    @EntityGraph(attributePaths = "release")
+    @EntityGraph(attributePaths = {"release", "genre", "genre.parent"})
     List<WishlistItem> findByUserIdOrderByAddedAtDesc(UUID userId);
 
-    @EntityGraph(attributePaths = "release")
+    @EntityGraph(attributePaths = {"release", "genre", "genre.parent"})
     Optional<WishlistItem> findByIdAndUserId(UUID id, UUID userId);
 
     @EntityGraph(attributePaths = "release")
     Optional<WishlistItem> findByUserIdAndReleaseId(UUID userId, UUID releaseId);
 
     long countByReleaseId(UUID releaseId);
+
+    @EntityGraph(attributePaths = "release")
+    List<WishlistItem> findByUserIdAndGenreIsNull(UUID userId);
 
     @Query("""
             select r.discogsId from WishlistItem w join w.release r

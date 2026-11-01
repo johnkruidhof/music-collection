@@ -43,6 +43,10 @@ public class AppUser {
     @Column(name = "display_name")
     private String displayName;
 
+    /** De standaardgenres zijn (eenmalig) aangemaakt (F-28). */
+    @Column(name = "genres_initialized", nullable = false)
+    private boolean genresInitialized;
+
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;

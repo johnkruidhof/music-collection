@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,6 +20,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import nl.johnkruidhof.musiccollection.dto.collection.CollectionItemDto;
 import nl.johnkruidhof.musiccollection.dto.collection.CollectionItemFields;
+import nl.johnkruidhof.musiccollection.dto.genre.GenreAssignment;
 import nl.johnkruidhof.musiccollection.dto.wishlist.AddToWishlistRequest;
 import nl.johnkruidhof.musiccollection.dto.wishlist.WishlistItemDto;
 import nl.johnkruidhof.musiccollection.service.WishlistService;
@@ -39,6 +41,13 @@ public class WishlistController {
     @PostMapping
     public WishlistItemDto add(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody AddToWishlistRequest request) {
         return wishlistService.add(jwt, request);
+    }
+
+    /** {@code { "genreId": … }}; {@code null} = geen genre. */
+    @PutMapping("/{id}/genre")
+    public WishlistItemDto setGenre(@AuthenticationPrincipal Jwt jwt, @PathVariable UUID id,
+            @RequestBody GenreAssignment assignment) {
+        return wishlistService.setGenre(jwt, id, assignment.genreId());
     }
 
     @DeleteMapping("/{id}")

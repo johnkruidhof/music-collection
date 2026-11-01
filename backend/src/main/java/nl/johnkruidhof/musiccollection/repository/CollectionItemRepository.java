@@ -23,13 +23,16 @@ public interface CollectionItemRepository extends JpaRepository<CollectionItem, 
         JpaSpecificationExecutor<CollectionItem> {
 
     @Override
-    @EntityGraph(attributePaths = "release")
+    @EntityGraph(attributePaths = {"release", "genre", "genre.parent"})
     Page<CollectionItem> findAll(Specification<CollectionItem> spec, Pageable pageable);
 
-    @EntityGraph(attributePaths = {"release", "release.tracks"})
+    @EntityGraph(attributePaths = {"release", "release.tracks", "genre", "genre.parent"})
     Optional<CollectionItem> findByIdAndUserId(UUID id, UUID userId);
 
     long countByUserId(UUID userId);
+
+    @EntityGraph(attributePaths = "release")
+    List<CollectionItem> findByUserIdAndGenreIsNull(UUID userId);
 
     long countByReleaseId(UUID releaseId);
 
