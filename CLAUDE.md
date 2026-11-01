@@ -448,8 +448,12 @@ npm run format                 # Prettier; format:check doet hetzelfde zonder te
   Standaardlijst `resources/genres/standaard-genres.txt` (eenmalig per gebruiker). `GenreTree` herkent
   subgenres aan de structuur (artiesten zonder jaartal, titels met jaartal eronder). Filter `genre=<id>|none`
   (incl. subgenres), sortering `genre`, stats `byGenre`, CSV-kolommen Genre/Subgenre, Discogs-import via artiest.
-- [ ] **F-29** Genres (frontend): filter/groeperen in overzicht, genre op detail/handmatig/verlanglijst,
+- [x] **F-29** Genres (frontend): filter/groeperen in overzicht, genre op detail/handmatig/verlanglijst,
   statistiek per genre, genres beheren en boomstructuur importeren
+  — `GenreStore` (genres één keer laden, platte keuzelijst met ingesprongen subgenres). Overzicht: filter
+  `?genre=`, sortering "Genre" met kopjes per genre/subgenre. Genre in het formulier "eigen gegevens"
+  (detail + handmatig), verlanglijst (genre per wens + filter), stats "Per genre". `/collectie/genres`:
+  beheren + boomstructuur importeren.
 
 ### Fase 3 — Audio-herkenning ("luisteren")
 - [x] **F-30** Onderzoek & proof of concept audioherkenning

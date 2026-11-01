@@ -28,8 +28,27 @@
   flex: 1 1 260px;
 }
 
-.sort {
+.sort,
+.genre {
   flex: 0 1 220px;
+}
+
+.group {
+  margin: 24px 0 12px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--mat-sys-primary);
+
+  &:first-of-type {
+    margin-top: 0;
+  }
+}
+
+.genre-tag {
+  padding: 0 8px;
+  border-radius: 8px;
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
 }
 
 .types {

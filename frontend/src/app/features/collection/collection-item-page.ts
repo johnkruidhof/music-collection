@@ -18,6 +18,7 @@ import {
 } from '../../shared/collection-fields-form';
 import { ConfirmDialog, ConfirmDialogData } from '../../shared/confirm-dialog';
 import { Cover } from '../../shared/cover';
+import { genreLabel } from '../../shared/genre-store';
 import { errorMessage } from '../../shared/http-error';
 import { DurationPipe, MediaTypePipe, SourcePipe } from '../../shared/label.pipes';
 
@@ -83,6 +84,10 @@ export class CollectionItemPage {
   readonly fields = createCollectionFieldsForm();
 
   protected readonly release = computed(() => this.item()?.release ?? null);
+  protected readonly genre = computed(() => {
+    const item = this.item();
+    return item ? genreLabel(item.genreName, item.subgenreName) : '';
+  });
   protected readonly discs = computed(() => groupByDisc(this.release()?.tracks ?? []));
   protected readonly totalDuration = computed(() => {
     const durations = (this.release()?.tracks ?? []).map((t) => t.durationSeconds);

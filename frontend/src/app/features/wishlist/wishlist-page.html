@@ -5,7 +5,21 @@
       <span class="count">({{ list.length }})</span>
     }
   </h1>
-  <a mat-stroked-button routerLink="/toevoegen/zoeken"><mat-icon>search</mat-icon> Zoeken</a>
+  <div class="header-actions">
+    <mat-form-field appearance="outline" class="genre-filter" subscriptSizing="dynamic">
+      <mat-label>Genre</mat-label>
+      <mat-select [value]="genreFilter()" (selectionChange)="genreFilter.set($event.value)">
+        <mat-option [value]="null">Alle genres</mat-option>
+        <mat-option value="none">Zonder genre</mat-option>
+        @for (option of genreStore.options(); track option.id) {
+          <mat-option [value]="option.id" [class.subgenre]="option.isSubgenre">{{
+            option.name
+          }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <a mat-stroked-button routerLink="/toevoegen/zoeken"><mat-icon>search</mat-icon> Zoeken</a>
+  </div>
 </header>
 
 @if (error()) {
@@ -17,8 +31,11 @@
       <p>Je verlanglijst is leeg. Zoek of scan een release en kies "Op verlanglijst".</p>
     </div>
   } @else {
+    @if (visible().length === 0) {
+      <p class="hint">Geen wensen in dit genre.</p>
+    }
     <ul class="list">
-      @for (item of list; track item.id) {
+      @for (item of visible(); track item.id) {
         <li class="item">
           <app-cover class="cover" [url]="item.coverThumbnailUrl" [alt]="item.title" />
           <div class="info">
@@ -34,6 +51,17 @@
             @if (item.notes) {
               <span class="notes">{{ item.notes }}</span>
             }
+            <mat-form-field appearance="outline" class="genre" subscriptSizing="dynamic">
+              <mat-label>Genre</mat-label>
+              <mat-select [value]="item.genreId" (selectionChange)="setGenre(item, $event.value)">
+                <mat-option [value]="null">Zonder genre</mat-option>
+                @for (option of genreStore.options(); track option.id) {
+                  <mat-option [value]="option.id" [class.subgenre]="option.isSubgenre">{{
+                    option.name
+                  }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
           </div>
           <div class="actions">
             <button

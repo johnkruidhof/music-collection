@@ -1,9 +1,10 @@
 import { TestBed } from '@angular/core/testing';
+import { GenreStore } from '../../shared/genre-store';
 import { Router, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 import { CollectionApiService } from '../../core/api/collection-api.service';
 import { CollectionItemSummary, CollectionPage as PageDto } from '../../core/models/collection';
-import { CollectionPage } from './collection-page';
+import { CollectionPage, groupByGenre } from './collection-page';
 
 const item = (id: string, title: string): CollectionItemSummary => ({
   id,
@@ -16,6 +17,9 @@ const item = (id: string, title: string): CollectionItemSummary => ({
   coverThumbnailUrl: null,
   conditionMedia: 'NEAR_MINT',
   storageLocation: 'Kast A',
+  genreId: null,
+  genreName: null,
+  subgenreName: null,
   addedAt: '2026-10-31T12:00:00Z',
 });
 
@@ -34,12 +38,22 @@ describe('CollectionPage', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
+    collectionApi.list.mockReturnValue(of(page([item('1', 'OK Computer'), item('2', 'Kid A')])));
     localStorage.clear();
     await TestBed.configureTestingModule({
       imports: [CollectionPage],
       providers: [
         provideRouter([{ path: 'collectie', component: CollectionPage }]),
         { provide: CollectionApiService, useValue: collectionApi },
+        {
+          provide: GenreStore,
+          useValue: {
+            ensureLoaded: () => undefined,
+            options: () => [],
+            genres: () => [],
+            matches: () => true,
+          },
+        },
       ],
     }).compileComponents();
   });
@@ -63,6 +77,7 @@ describe('CollectionPage', () => {
     expect(collectionApi.list).toHaveBeenCalledWith({
       q: 'radio',
       mediaType: 'CD',
+      genre: null,
       sort: 'artist,desc',
       page: 2,
       size: 48,
@@ -77,6 +92,7 @@ describe('CollectionPage', () => {
     expect(collectionApi.list).toHaveBeenCalledWith({
       q: null,
       mediaType: null,
+      genre: null,
       sort: 'added,desc',
       page: 0,
       size: 24,
@@ -107,6 +123,39 @@ describe('CollectionPage', () => {
     expect(selected?.textContent).toContain('Alle');
   });
 
+  it('filtert op genre via de URL en groepeert bij sorteren op genre', async () => {
+    collectionApi.list.mockReturnValue(
+      of(
+        page([
+          {
+            ...item('1', 'Lateralus'),
+            genreName: 'Hardrock - Metal',
+            subgenreName: 'Progressive Metal',
+          },
+          {
+            ...item('2', 'Aenima'),
+            genreName: 'Hardrock - Metal',
+            subgenreName: 'Progressive Metal',
+          },
+          { ...item('3', 'Iets'), genreName: null, subgenreName: null },
+        ]),
+      ),
+    );
+    const { el, router, fixture, page: pageCmp } = await open('/collectie?genre=g1&sort=genre,asc');
+
+    expect(collectionApi.list).toHaveBeenLastCalledWith(
+      expect.objectContaining({ genre: 'g1', sort: 'genre,asc' }),
+    );
+    expect(Array.from(el.querySelectorAll('h2.group')).map((h) => h.textContent?.trim())).toEqual([
+      'Hardrock - Metal › Progressive Metal',
+      'Zonder genre',
+    ]);
+
+    pageCmp.setGenre('none');
+    await fixture.whenStable();
+    expect(router.url).toBe('/collectie?genre=none&sort=genre,asc');
+  });
+
   it('onthoudt de lijstweergave', async () => {
     const { fixture, page, el } = await open('/collectie');
 
@@ -125,5 +174,20 @@ describe('CollectionPage', () => {
 
     const filtered = await open('/collectie?q=xyz');
     expect(filtered.el.textContent).toContain('Niets gevonden met deze filters.');
+  });
+});
+
+describe('groupByGenre', () => {
+  it('voegt opeenvolgende items met hetzelfde genre samen', () => {
+    const base = item('1', 'A');
+    const groups = groupByGenre([
+      { ...base, id: '1', genreName: 'Jazz', subgenreName: null },
+      { ...base, id: '2', genreName: 'Jazz', subgenreName: null },
+      { ...base, id: '3', genreName: 'Rock', subgenreName: 'Psychedelica' },
+    ]);
+    expect(groups.map((g) => [g.label, g.items.length])).toEqual([
+      ['Jazz', 2],
+      ['Rock › Psychedelica', 1],
+    ]);
   });
 });

@@ -1,10 +1,11 @@
-import { Component, input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { CollectionItemFields } from '../core/models/collection';
 import { MEDIA_CONDITIONS, MediaCondition } from '../core/models/release';
+import { GenreStore } from './genre-store';
 import { ConditionPipe } from './label.pipes';
 
 export type CollectionFieldsForm = FormGroup<{
@@ -15,6 +16,7 @@ export type CollectionFieldsForm = FormGroup<{
   purchaseLocation: FormControl<string>;
   storageLocation: FormControl<string>;
   notes: FormControl<string>;
+  genreId: FormControl<string | null>;
 }>;
 
 export function createCollectionFieldsForm(
@@ -38,6 +40,7 @@ export function createCollectionFieldsForm(
       nonNullable: true,
       validators: [Validators.maxLength(255)],
     }),
+    genreId: new FormControl<string | null>(fields?.genreId ?? null),
     notes: new FormControl(fields?.notes ?? '', {
       nonNullable: true,
       validators: [Validators.maxLength(4000)],
@@ -58,6 +61,7 @@ export function collectionFieldsValue(form: CollectionFieldsForm): CollectionIte
     purchaseLocation: text(v.purchaseLocation),
     storageLocation: text(v.storageLocation),
     notes: text(v.notes),
+    genreId: v.genreId,
   };
 }
 
@@ -76,6 +80,11 @@ export function collectionFieldsValue(form: CollectionFieldsForm): CollectionIte
 })
 export class CollectionFieldsFormComponent {
   readonly form = input.required<CollectionFieldsForm>();
+  protected readonly genres = inject(GenreStore);
   protected readonly conditions = MEDIA_CONDITIONS;
+
+  constructor() {
+    this.genres.ensureLoaded();
+  }
   protected readonly today = new Date().toISOString().slice(0, 10);
 }

@@ -35,6 +35,10 @@
 
     <div class="charts">
       <section>
+        <h2>Per genre</h2>
+        <app-bar-list [rows]="byGenre()" label="Aantal releases per genre" />
+      </section>
+      <section>
         <h2>Per type</h2>
         <app-bar-list [rows]="byType()" label="Aantal releases per type" />
       </section>

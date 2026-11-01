@@ -1,0 +1,146 @@
+<a mat-button routerLink="/collectie"><mat-icon>arrow_back</mat-icon> Collectie</a>
+<h1>Genres</h1>
+<p class="hint">
+  Je eigen indeling van de collectie. Een genre kan subgenres hebben (bv. Hardrock - Metal → Doom
+  Metal). Bij toevoegen stelt de app een genre voor op basis van de artiest; kies je zelf een genre,
+  dan onthoudt de app dat voor die artiest.
+</p>
+
+<ng-template #nameForm>
+  <form class="name-form" (submit)="$event.preventDefault(); save()">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Naam</mat-label>
+      <input matInput [formControl]="nameControl" autocomplete="off" maxlength="100" />
+    </mat-form-field>
+    <button mat-flat-button type="submit">Opslaan</button>
+    <button mat-button type="button" (click)="cancel()">Annuleren</button>
+  </form>
+</ng-template>
+
+<section class="genres">
+  <div class="section-header">
+    <h2>Mijn genres</h2>
+    <button mat-stroked-button type="button" (click)="startNew()">
+      <mat-icon>add</mat-icon> Genre toevoegen
+    </button>
+  </div>
+  @if (isNewUnder(null)) {
+    <ng-container *ngTemplateOutlet="nameForm" />
+  }
+
+  <ul class="tree">
+    @for (genre of store.genres(); track genre.id) {
+      <li>
+        <div class="row">
+          @if (isRenaming(genre)) {
+            <ng-container *ngTemplateOutlet="nameForm" />
+          } @else {
+            <span class="name">{{ genre.name }}</span>
+            <span class="count">{{ itemCount(genre) }}</span>
+            <span class="actions">
+              <button
+                mat-icon-button
+                type="button"
+                (click)="startNew(genre.id)"
+                aria-label="Subgenre toevoegen"
+                title="Subgenre toevoegen"
+              >
+                <mat-icon>subdirectory_arrow_right</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                type="button"
+                (click)="startRename(genre)"
+                aria-label="Hernoemen"
+                title="Hernoemen"
+              >
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                type="button"
+                (click)="remove(genre)"
+                aria-label="Verwijderen"
+                title="Verwijderen"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </span>
+          }
+        </div>
+        @if (genre.subgenres.length > 0 || isNewUnder(genre.id)) {
+          <ul class="subgenres">
+            @for (sub of genre.subgenres; track sub.id) {
+              <li class="row">
+                @if (isRenaming(sub)) {
+                  <ng-container *ngTemplateOutlet="nameForm" />
+                } @else {
+                  <span class="name">{{ sub.name }}</span>
+                  <span class="count">{{ sub.itemCount }}</span>
+                  <span class="actions">
+                    <button
+                      mat-icon-button
+                      type="button"
+                      (click)="startRename(sub)"
+                      aria-label="Hernoemen"
+                      title="Hernoemen"
+                    >
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button
+                      mat-icon-button
+                      type="button"
+                      (click)="remove(sub)"
+                      aria-label="Verwijderen"
+                      title="Verwijderen"
+                    >
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </span>
+                }
+              </li>
+            }
+            @if (isNewUnder(genre.id)) {
+              <li><ng-container *ngTemplateOutlet="nameForm" /></li>
+            }
+          </ul>
+        }
+      </li>
+    } @empty {
+      <li class="hint">Nog geen genres.</li>
+    }
+  </ul>
+</section>
+
+<section class="import">
+  <h2>Boomstructuur importeren</h2>
+  <p class="hint">
+    Heb je je muziek in mappen staan als <em>Genre / Artiest / 1997 - Album</em> (of
+    <em>Genre / Subgenre / Artiest / 1997 - Album</em>)? Importeer dan een boomstructuur van die
+    mappen, bv. gemaakt met <code>tree</code>. De app maakt ontbrekende genres aan, onthoudt per
+    artiest het genre en deelt releases en wensen zonder genre direct in. Opnieuw importeren is
+    veilig.
+  </p>
+  <input #treeInput type="file" accept=".txt,text/plain" hidden (change)="onTreeSelected($event)" />
+  <button mat-flat-button type="button" [disabled]="importing()" (click)="treeInput.click()">
+    <mat-icon>account_tree</mat-icon> Boomstructuur kiezen
+  </button>
+  @if (importing()) {
+    <mat-progress-bar mode="indeterminate" />
+  }
+  @if (importResult(); as r) {
+    <ul class="result" aria-live="polite">
+      <li>
+        <strong>{{ r.genresCreated }}</strong> nieuwe genres,
+        <strong>{{ r.subgenresCreated }}</strong> nieuwe subgenres
+      </li>
+      <li>
+        <strong>{{ r.artistsLinked }}</strong> artiesten gekoppeld aan een genre
+      </li>
+      <li>
+        <strong>{{ r.itemsAssigned }}</strong> releases en
+        <strong>{{ r.wishesAssigned }}</strong> wensen ingedeeld
+      </li>
+    </ul>
+  }
+</section>

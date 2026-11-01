@@ -13,13 +13,21 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { catchError, debounceTime, distinctUntilChanged, map, of, switchMap, tap } from 'rxjs';
 import { CollectionApiService } from '../../core/api/collection-api.service';
-import { CollectionPage as CollectionPageDto, CollectionQuery } from '../../core/models/collection';
+import {
+  CollectionItemSummary,
+  CollectionPage as CollectionPageDto,
+  CollectionQuery,
+} from '../../core/models/collection';
 import { MEDIA_TYPES, MediaType } from '../../core/models/release';
 import { Cover } from '../../shared/cover';
 import { errorMessage } from '../../shared/http-error';
+import { GenreStore, genreLabel } from '../../shared/genre-store';
 import { ConditionPipe, MediaTypePipe } from '../../shared/label.pipes';
 
 export type ViewMode = 'grid' | 'list';
+
+/** Filterwaarde voor items zonder genre (zoals de backend). */
+export const NO_GENRE = 'none';
 
 export const SORT_OPTIONS = [
   { value: 'added,desc', label: 'Laatst toegevoegd' },
@@ -28,7 +36,29 @@ export const SORT_OPTIONS = [
   { value: 'title,asc', label: 'Titel A–Z' },
   { value: 'year,desc', label: 'Jaar (nieuw → oud)' },
   { value: 'year,asc', label: 'Jaar (oud → nieuw)' },
+  { value: 'genre,asc', label: 'Genre' },
 ] as const;
+
+/** Items van één genre (bij sorteren op genre), of alle items zonder kopje ({@code label} null). */
+export interface ItemGroup {
+  label: string | null;
+  items: CollectionItemSummary[];
+}
+
+/** Opeenvolgende items met hetzelfde genre/subgenre bij elkaar, met een kopje per groep. */
+export function groupByGenre(items: CollectionItemSummary[]): ItemGroup[] {
+  const groups: ItemGroup[] = [];
+  for (const item of items) {
+    const label = genreLabel(item.genreName, item.subgenreName);
+    const last = groups.at(-1);
+    if (last && last.label === label) {
+      last.items.push(item);
+    } else {
+      groups.push({ label, items: [item] });
+    }
+  }
+  return groups;
+}
 
 const DEFAULT_SORT = 'added,desc';
 const PAGE_SIZES = [24, 48, 96];
@@ -75,9 +105,12 @@ export class CollectionPage {
 
   protected readonly searchControl = new FormControl('', { nonNullable: true });
 
+  protected readonly genreStore = inject(GenreStore);
+
   readonly query = signal<Required<CollectionQuery>>({
     q: null,
     mediaType: null,
+    genre: null,
     sort: DEFAULT_SORT,
     page: 0,
     size: PAGE_SIZES[0],
@@ -94,10 +127,19 @@ export class CollectionPage {
     return r.kind === 'error' ? r.message : '';
   });
   /** Geen filters actief: een lege pagina betekent dan een lege collectie. */
-  protected readonly unfiltered = computed(() => !this.query().q && !this.query().mediaType);
+  protected readonly unfiltered = computed(
+    () => !this.query().q && !this.query().mediaType && !this.query().genre,
+  );
+  protected readonly sortedByGenre = computed(() => !!this.query().sort?.startsWith('genre'));
+  /** Bij sorteren op genre een kopje per genre/subgenre, anders één groep zonder kopje. */
+  protected readonly groups = computed<ItemGroup[]>(() => {
+    const items = this.page()?.content ?? [];
+    return this.sortedByGenre() ? groupByGenre(items) : [{ label: null, items }];
+  });
 
   constructor() {
     const destroyRef = inject(DestroyRef);
+    this.genreStore.ensureLoaded();
 
     this.route.queryParamMap
       .pipe(
@@ -125,6 +167,11 @@ export class CollectionPage {
     this.searchControl.valueChanges
       .pipe(debounceTime(300), distinctUntilChanged(), takeUntilDestroyed(destroyRef))
       .subscribe((q) => this.navigate({ q: q.trim() || null, page: 0 }, true));
+  }
+
+  /** Genre-id, {@link NO_GENRE} of null (alle). */
+  setGenre(genre: string | null): void {
+    this.navigate({ genre, page: 0 });
   }
 
   setMediaType(mediaType: MediaType | null): void {
@@ -159,7 +206,7 @@ export class CollectionPage {
 
   clearFilters(): void {
     this.searchControl.setValue('', { emitEvent: false });
-    this.navigate({ q: null, mediaType: null, page: 0 });
+    this.navigate({ q: null, mediaType: null, genre: null, page: 0 });
   }
 
   private navigate(changes: Partial<CollectionQuery>, replaceUrl = false): void {
@@ -170,6 +217,7 @@ export class CollectionPage {
       queryParams: {
         q: next.q || null,
         type: next.mediaType || null,
+        genre: next.genre || null,
         sort: next.sort === DEFAULT_SORT ? null : next.sort,
         page: next.page ? next.page : null,
         size: next.size === PAGE_SIZES[0] ? null : next.size,
@@ -187,6 +235,7 @@ function parseQuery(params: ParamMap): Required<CollectionQuery> {
   return {
     q: params.get('q'),
     mediaType: type && MEDIA_TYPES.includes(type) ? type : null,
+    genre: params.get('genre') || null,
     sort: SORT_OPTIONS.some((o) => o.value === sort) ? (sort as string) : DEFAULT_SORT,
     page: Number.isInteger(page) && page > 0 ? page : 0,
     size: PAGE_SIZES.includes(size) ? size : PAGE_SIZES[0],

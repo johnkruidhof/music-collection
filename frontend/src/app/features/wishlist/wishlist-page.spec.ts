@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { GenreStore } from '../../shared/genre-store';
 import { provideRouter } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -23,6 +24,9 @@ const wish = (id: string, title: string): WishlistItem => ({
   discogsId: '1',
   musicbrainzId: null,
   notes: 'cadeau',
+  genreId: null,
+  genreName: null,
+  subgenreName: null,
   addedAt: '2026-10-31T12:00:00Z',
 });
 
@@ -43,6 +47,15 @@ describe('WishlistPage', () => {
       providers: [
         provideRouter([]),
         { provide: WishlistApiService, useValue: wishlistApi },
+        {
+          provide: GenreStore,
+          useValue: {
+            ensureLoaded: () => undefined,
+            options: () => [],
+            genres: () => [],
+            matches: () => true,
+          },
+        },
         { provide: MatDialog, useValue: dialog },
         { provide: MatSnackBar, useValue: snackBar },
       ],

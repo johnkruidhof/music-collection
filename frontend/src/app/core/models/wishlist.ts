@@ -16,5 +16,8 @@ export interface WishlistItem {
   discogsId: string | null;
   musicbrainzId: string | null;
   notes: string | null;
+  genreId: string | null;
+  genreName: string | null;
+  subgenreName: string | null;
   addedAt: string;
 }

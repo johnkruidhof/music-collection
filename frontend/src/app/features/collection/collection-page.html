@@ -6,6 +6,7 @@
     }
   </h1>
   <div class="header-actions">
+    <a mat-button routerLink="/collectie/genres"> <mat-icon>category</mat-icon> Genres </a>
     <a mat-button routerLink="/collectie/luisteren">
       <mat-icon>hearing</mat-icon> Welke plaat is dit?
     </a>
@@ -21,6 +22,19 @@
     <mat-icon matPrefix>search</mat-icon>
     <mat-label>Zoek op artiest of titel</mat-label>
     <input matInput [formControl]="searchControl" type="search" autocomplete="off" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="genre" subscriptSizing="dynamic">
+    <mat-label>Genre</mat-label>
+    <mat-select [value]="query().genre" (selectionChange)="setGenre($event.value)">
+      <mat-option [value]="null">Alle genres</mat-option>
+      <mat-option value="none">Zonder genre</mat-option>
+      @for (option of genreStore.options(); track option.id) {
+        <mat-option [value]="option.id" [class.subgenre]="option.isSubgenre">{{
+          option.name
+        }}</mat-option>
+      }
+    </mat-select>
   </mat-form-field>
 
   <mat-form-field appearance="outline" class="sort" subscriptSizing="dynamic">
@@ -84,50 +98,63 @@
           }
         </div>
       } @else if (view() === 'grid') {
-        <ul class="grid">
-          @for (item of p.content; track item.id) {
-            <li>
-              <a class="card" [routerLink]="['/collectie', item.id]">
-                <app-cover [url]="item.coverThumbnailUrl" [alt]="item.title" />
-                <span class="title">{{ item.title }}</span>
-                <span class="artist">{{ item.artist }}</span>
-                <span class="meta">
-                  {{ item.mediaType | mediaType
-                  }}{{ item.releaseYear ? ' · ' + item.releaseYear : '' }}
-                </span>
-              </a>
-            </li>
+        @for (group of groups(); track group.label) {
+          @if (group.label) {
+            <h2 class="group">{{ group.label }}</h2>
           }
-        </ul>
-      } @else {
-        <ul class="list">
-          @for (item of p.content; track item.id) {
-            <li>
-              <a class="row" [routerLink]="['/collectie', item.id]">
-                <app-cover class="thumb" [url]="item.coverThumbnailUrl" [alt]="item.title" />
-                <span class="text">
+          <ul class="grid">
+            @for (item of group.items; track item.id) {
+              <li>
+                <a class="card" [routerLink]="['/collectie', item.id]">
+                  <app-cover [url]="item.coverThumbnailUrl" [alt]="item.title" />
                   <span class="title">{{ item.title }}</span>
                   <span class="artist">{{ item.artist }}</span>
-                </span>
-                <span class="meta">
-                  {{ item.mediaType | mediaType
-                  }}{{ item.releaseYear ? ' · ' + item.releaseYear : '' }}
-                  @if (item.formatDetails) {
-                    <span class="format">{{ item.formatDetails }}</span>
-                  }
-                </span>
-                <span class="extra">
-                  @if (item.conditionMedia) {
-                    <span>{{ item.conditionMedia | condition }}</span>
-                  }
-                  @if (item.storageLocation) {
-                    <span><mat-icon inline>place</mat-icon> {{ item.storageLocation }}</span>
-                  }
-                </span>
-              </a>
-            </li>
+                  <span class="meta">
+                    {{ item.mediaType | mediaType
+                    }}{{ item.releaseYear ? ' · ' + item.releaseYear : '' }}
+                  </span>
+                </a>
+              </li>
+            }
+          </ul>
+        }
+      } @else {
+        @for (group of groups(); track group.label) {
+          @if (group.label) {
+            <h2 class="group">{{ group.label }}</h2>
           }
-        </ul>
+          <ul class="list">
+            @for (item of group.items; track item.id) {
+              <li>
+                <a class="row" [routerLink]="['/collectie', item.id]">
+                  <app-cover class="thumb" [url]="item.coverThumbnailUrl" [alt]="item.title" />
+                  <span class="text">
+                    <span class="title">{{ item.title }}</span>
+                    <span class="artist">{{ item.artist }}</span>
+                  </span>
+                  <span class="meta">
+                    {{ item.mediaType | mediaType
+                    }}{{ item.releaseYear ? ' · ' + item.releaseYear : '' }}
+                    @if (item.formatDetails) {
+                      <span class="format">{{ item.formatDetails }}</span>
+                    }
+                  </span>
+                  <span class="extra">
+                    @if (item.genreName && !sortedByGenre()) {
+                      <span class="genre-tag">{{ item.subgenreName ?? item.genreName }}</span>
+                    }
+                    @if (item.conditionMedia) {
+                      <span>{{ item.conditionMedia | condition }}</span>
+                    }
+                    @if (item.storageLocation) {
+                      <span><mat-icon inline>place</mat-icon> {{ item.storageLocation }}</span>
+                    }
+                  </span>
+                </a>
+              </li>
+            }
+          </ul>
+        }
       }
 
       @if (p.totalElements > pageSizes[0]) {

@@ -79,3 +79,20 @@
 .error {
   color: var(--mat-sys-error);
 }
+
+.header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.genre-filter {
+  width: 220px;
+}
+.genre {
+  margin-top: 8px;
+  max-width: 280px;
+}
+.hint {
+  color: var(--mat-sys-on-surface-variant);
+}

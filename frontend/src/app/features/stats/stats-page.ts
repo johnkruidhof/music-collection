@@ -46,6 +46,12 @@ export class StatsPage {
   protected readonly topArtists = computed<BarRow[]>(() =>
     (this.stats()?.topArtists ?? []).map((r) => ({ label: r.artist, value: r.count })),
   );
+  protected readonly byGenre = computed<BarRow[]>(() =>
+    (this.stats()?.byGenre ?? []).map((r) => ({
+      label: r.genre ?? 'Zonder genre',
+      value: r.count,
+    })),
+  );
   protected readonly byCondition = computed<BarRow[]>(() =>
     (this.stats()?.byCondition ?? []).map((r) => ({
       label: r.condition ? CONDITION_LABELS[r.condition] : 'Niet ingevuld',

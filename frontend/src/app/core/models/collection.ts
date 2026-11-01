@@ -10,11 +10,16 @@ export interface CollectionItemFields {
   purchaseLocation: string | null;
   storageLocation: string | null;
   notes: string | null;
+  /** Eigen genre of subgenre (F-28); bij toevoegen zonder genre stelt de backend er een voor via de artiest. */
+  genreId: string | null;
 }
 
 export interface CollectionItem extends CollectionItemFields {
   id: string;
   release: Release;
+  /** Hoofdgenre (ook als het item een subgenre heeft). */
+  genreName: string | null;
+  subgenreName: string | null;
   addedAt: string;
   updatedAt: string;
 }
@@ -30,6 +35,9 @@ export interface CollectionItemSummary {
   coverThumbnailUrl: string | null;
   conditionMedia: MediaCondition | null;
   storageLocation: string | null;
+  genreId: string | null;
+  genreName: string | null;
+  subgenreName: string | null;
   addedAt: string;
 }
 
@@ -49,11 +57,13 @@ export interface AddToCollectionRequest {
   fields?: CollectionItemFields | null;
 }
 
-export type CollectionSortField = 'added' | 'artist' | 'title' | 'year';
+export type CollectionSortField = 'added' | 'artist' | 'title' | 'year' | 'genre';
 
 export interface CollectionQuery {
   q?: string | null;
   mediaType?: MediaType | null;
+  /** Genre-id (inclusief subgenres) of 'none' voor items zonder genre. */
+  genre?: string | null;
   /** bv. "artist,asc" of "added,desc" */
   sort?: string | null;
   page?: number;

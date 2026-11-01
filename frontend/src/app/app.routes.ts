@@ -16,6 +16,12 @@ export const routes: Routes = [
     title: 'Mijn collectie',
   },
   {
+    path: 'collectie/genres',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/genres/genres-page').then((m) => m.GenresPage),
+    title: 'Genres',
+  },
+  {
     path: 'collectie/luisteren',
     canActivate: [authGuard],
     loadComponent: () => import('./features/add/listen/listen-page').then((m) => m.ListenPage),

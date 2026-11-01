@@ -1,4 +1,16 @@
 <div class="grid" [formGroup]="form()">
+  <mat-form-field appearance="outline" class="wide">
+    <mat-label>Genre</mat-label>
+    <mat-select formControlName="genreId">
+      <mat-option [value]="null">Zonder genre</mat-option>
+      @for (option of genres.options(); track option.id) {
+        <mat-option [value]="option.id" [class.subgenre]="option.isSubgenre">{{
+          option.name
+        }}</mat-option>
+      }
+    </mat-select>
+    <mat-hint>Beheer je genres via Collectie → Genres</mat-hint>
+  </mat-form-field>
   <mat-form-field appearance="outline">
     <mat-label>Staat plaat/disc</mat-label>
     <mat-select formControlName="conditionMedia">

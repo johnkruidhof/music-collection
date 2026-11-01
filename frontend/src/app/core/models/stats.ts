@@ -11,4 +11,6 @@ export interface CollectionStats {
   topArtists: { artist: string; count: number }[];
   /** condition null = staat niet ingevuld */
   byCondition: { condition: MediaCondition | null; count: number }[];
+  /** Per hoofdgenre (subgenres tellen mee); genre null = zonder genre (F-28). */
+  byGenre: { genre: string | null; count: number }[];
 }

@@ -22,6 +22,10 @@ const stats: CollectionStats = {
     { decade: null, count: 1 },
   ],
   topArtists: [{ artist: 'Radiohead', count: 2 }],
+  byGenre: [
+    { genre: 'Hardrock - Metal', count: 3 },
+    { genre: null, count: 1 },
+  ],
   byCondition: [
     { condition: 'NEAR_MINT', count: 2 },
     { condition: null, count: 2 },
