@@ -3,6 +3,32 @@
 Versies volgen [Semantic Versioning](https://semver.org/lang/nl/). Tot 1.0.0 is de app functioneel in
 ontwikkeling en nog niet ingericht voor publiek gebruik.
 
+## [0.10.0] — 2026-11-01
+
+Genres: de collectie ordenen op eigen genres en subgenres. Nog steeds een pre-release; 1.0.0 volgt na fase 4.
+
+### Genres (#25, #26)
+- **Eigen genres per gebruiker**, met optionele subgenres. Nieuwe gebruikers starten met een standaardlijst
+  van 14 genres, waaronder Hardrock - Metal met 10 subgenres (AOR, Doom Metal, Grunge, …).
+- **Boomstructuur importeren** (Collectie → Genres): een boomstructuur van je muziekmappen
+  (*Genre / [Subgenre /] Artiest / 1997 - Album*) maakt ontbrekende genres aan, koppelt artiesten aan hun
+  genre en deelt bestaande releases en wensen zonder genre direct in. Subgenres worden aan de structuur
+  herkend; opnieuw importeren is veilig.
+- **Genre-voorstel** op basis van de artiest bij toevoegen (scannen, zoeken, handmatig, verlanglijst,
+  Discogs-import); een zelf gekozen genre wordt onthouden voor die artiest.
+- **Collectie-overzicht**: filteren op genre (een hoofdgenre toont ook zijn subgenres, of "zonder genre")
+  en sorteren op genre met een kopje per genre/subgenre.
+- Genre op de detailpagina en bij handmatig toevoegen, per wens op de verlanglijst (met filter), een
+  verdeling *Per genre* in de statistieken en de kolommen Genre en Subgenre in de CSV-export.
+- Genres beheren: toevoegen, subgenres toevoegen, hernoemen, verwijderen (releases houden hun plek, zonder
+  genre).
+
+### Beveiliging
+- Spring Boot 4.1.2: bijgewerkte Tomcat, Spring Framework, Jackson, Log4j en PostgreSQL-driver met
+  oplossingen voor bekende kwetsbaarheden, waaronder kritieke in Tomcat en Spring (#27).
+- `minimatch` 11 in de lint-tooling van de frontend (DoS-lek, alleen development) (#28).
+- Dependabot alerts en security updates staan aan voor de repository.
+
 ## [0.9.0] — 2026-11-01
 
 Eerste release: **functioneel compleet, nog niet productieklaar** (pre-release). Fase 0 t/m 3 van de backlog
@@ -44,4 +70,5 @@ in CLAUDE.md zijn af; fase 4 (publiek online) volgt richting 1.0.0.
 - Importvoortgang staat in het geheugen en is na een herstart van de backend weg (opnieuw importeren is veilig).
 - Nog geen dubbelen-controle bij handmatig invoeren en geen import van het eigen CSV-formaat.
 
+[0.10.0]: https://github.com/johnkruidhof/music-collection/releases/tag/v0.10.0
 [0.9.0]: https://github.com/johnkruidhof/music-collection/releases/tag/v0.9.0
