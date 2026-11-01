@@ -43,6 +43,7 @@ public class WishlistService {
     private final WishlistMapper wishlistMapper;
     private final CollectionItemMapper collectionItemMapper;
     private final TransactionTemplate transactionTemplate;
+    private final GenreService genreService;
 
     @Transactional
     public List<WishlistItemDto> list(Jwt jwt) {
@@ -54,7 +55,7 @@ public class WishlistService {
     public WishlistItemDto add(Jwt jwt, AddToWishlistRequest request) {
         UUID releaseId = catalogService.getOrImport(request.source(), request.externalId().strip());
         try {
-            return transactionTemplate.execute(status -> addInTransaction(jwt, releaseId, request.notes()));
+            return transactionTemplate.execute(status -> addInTransaction(jwt, releaseId, request));
         } catch (DataIntegrityViolationException ex) {
             // Tegelijk twee keer toegevoegd: de unieke index won, geef de bestaande terug.
             return transactionTemplate.execute(status -> wishlistMapper.toDto(wishlistItemRepository
@@ -62,7 +63,8 @@ public class WishlistService {
         }
     }
 
-    private WishlistItemDto addInTransaction(Jwt jwt, UUID releaseId, String notes) {
+    private WishlistItemDto addInTransaction(Jwt jwt, UUID releaseId, AddToWishlistRequest request) {
+        String notes = request.notes();
         AppUser user = userService.getOrCreate(jwt);
         return wishlistItemRepository.findByUserIdAndReleaseId(user.getId(), releaseId)
                 .map(wishlistMapper::toDto)
@@ -71,8 +73,21 @@ public class WishlistService {
                             .orElseThrow(() -> new ResourceNotFoundException("Release", releaseId));
                     WishlistItem item = new WishlistItem(user, release);
                     item.setNotes(notes == null || notes.isBlank() ? null : notes.strip());
+                    item.setGenre(request.genreId() != null
+                            ? genreService.resolve(user.getId(), request.genreId())
+                            : genreService.suggest(user.getId(), release.getArtist()).orElse(null));
                     return wishlistMapper.toDto(wishlistItemRepository.saveAndFlush(item));
                 });
+    }
+
+    /** Genre van een wens wijzigen ({@code null} = geen genre); wordt ook onthouden voor de artiest. */
+    @Transactional
+    public WishlistItemDto setGenre(Jwt jwt, UUID id, UUID genreId) {
+        WishlistItem wish = findOwned(jwt, id);
+        UUID userId = wish.getUser().getId();
+        wish.setGenre(genreId == null ? null : genreService.resolve(userId, genreId));
+        genreService.learn(userId, wish.getRelease().getArtist(), wish.getGenre());
+        return wishlistMapper.toDto(wish);
     }
 
     @Transactional
@@ -85,7 +100,12 @@ public class WishlistService {
     public CollectionItemDto acquire(Jwt jwt, UUID id, CollectionItemFields fields) {
         WishlistItem wish = findOwned(jwt, id);
         CollectionItem item = new CollectionItem(wish.getUser(), wish.getRelease());
-        collectionItemMapper.applyFields(fields == null ? CollectionItemFields.EMPTY : fields, item);
+        CollectionItemFields itemFields = fields == null ? CollectionItemFields.EMPTY : fields;
+        collectionItemMapper.applyFields(itemFields, item);
+        // Genre van de wens gaat mee, tenzij er bij het kopen een ander is gekozen.
+        item.setGenre(itemFields.genreId() != null
+                ? genreService.resolve(wish.getUser().getId(), itemFields.genreId())
+                : wish.getGenre());
         CollectionItem saved = collectionItemRepository.saveAndFlush(item);
         wishlistItemRepository.delete(wish);
         return collectionItemMapper.toDto(saved);

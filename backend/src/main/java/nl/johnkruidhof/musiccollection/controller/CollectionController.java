@@ -33,15 +33,16 @@ public class CollectionController {
 
     private final CollectionService collectionService;
 
-    /** {@code ?q=&mediaType=&sort=artist,asc&page=0&size=24} */
+    /** {@code ?q=&mediaType=&genre=<id>|none&sort=genre,asc&page=0&size=24} */
     @GetMapping
     public CollectionPageDto list(@AuthenticationPrincipal Jwt jwt,
             @RequestParam(required = false) String q,
             @RequestParam(required = false) MediaType mediaType,
+            @RequestParam(required = false) String genre,
             @RequestParam(required = false) String sort,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "24") int size) {
-        return collectionService.list(jwt, q, mediaType, sort, page, size);
+        return collectionService.list(jwt, q, mediaType, genre, sort, page, size);
     }
 
     @GetMapping("/{id}")

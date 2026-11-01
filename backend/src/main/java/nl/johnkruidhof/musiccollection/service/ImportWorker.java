@@ -38,6 +38,7 @@ class ImportWorker {
     private final CollectionItemRepository collectionItemRepository;
     private final AppUserRepository userRepository;
     private final TransactionTemplate transactionTemplate;
+    private final GenreService genreService;
 
     @Async
     public void run(ImportService.Job job, List<DiscogsCsvImport.Row> rows) {
@@ -94,6 +95,7 @@ class ImportWorker {
             item.setConditionMedia(row.conditionMedia());
             item.setConditionSleeve(row.conditionSleeve());
             item.setNotes(row.notes() == null ? null : row.notes().substring(0, Math.min(4000, row.notes().length())));
+            item.setGenre(genreService.suggest(userId, release.getArtist()).orElse(null));
             collectionItemRepository.save(item);
             added++;
         }

@@ -9,6 +9,6 @@ public final class TestDatabase {
     }
 
     public static void clean(JdbcTemplate jdbc) {
-        jdbc.execute("TRUNCATE wishlist_item, collection_item, cover_image, track, release, app_user CASCADE");
+        jdbc.execute("TRUNCATE artist_genre, wishlist_item, collection_item, genre, cover_image, track, release, app_user CASCADE");
     }
 }

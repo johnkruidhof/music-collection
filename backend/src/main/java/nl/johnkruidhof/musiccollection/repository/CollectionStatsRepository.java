@@ -48,6 +48,15 @@ public interface CollectionStatsRepository extends Repository<CollectionItem, UU
             order by count(ci) desc, r.artist""")
     List<CollectionStatsDto.ArtistCount> topArtists(UUID userId, Pageable pageable);
 
+    @Query("""
+            select new nl.johnkruidhof.musiccollection.dto.stats.CollectionStatsDto$GenreCount(
+                coalesce(p.name, g.name), count(ci))
+            from CollectionItem ci left join ci.genre g left join g.parent p
+            where ci.user.id = :userId
+            group by coalesce(p.name, g.name)
+            order by count(ci) desc, coalesce(p.name, g.name) nulls last""")
+    List<CollectionStatsDto.GenreCount> countByGenre(UUID userId);
+
     /** Ongesorteerd: de enum staat als tekst in de database, de Goldmine-volgorde regelt de service. */
     @Query("""
             select new nl.johnkruidhof.musiccollection.dto.stats.CollectionStatsDto$ConditionCount(ci.conditionMedia, count(ci))

@@ -30,7 +30,8 @@ public class CollectionExportService {
     static final char SEPARATOR = ';';
     static final List<String> HEADER = List.of("Artiest", "Titel", "Jaar", "Type", "Formaat", "Label",
             "Catalogusnummer", "Land", "Barcode", "Bron", "Discogs-id", "MusicBrainz-id", "Staat plaat",
-            "Staat hoes", "Aankoopdatum", "Aankoopprijs", "Gekocht bij", "Opslaglocatie", "Notities", "Toegevoegd");
+            "Staat hoes", "Aankoopdatum", "Aankoopprijs", "Gekocht bij", "Opslaglocatie", "Notities", "Toegevoegd",
+            "Genre", "Subgenre");
     private static final DateTimeFormatter ADDED_AT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
             .withZone(ZoneId.of("Europe/Amsterdam"));
 
@@ -53,7 +54,9 @@ public class CollectionExportService {
                 text(r.getBarcode()), text(r.getSource()), text(r.getDiscogsId()), text(r.getMusicbrainzId()),
                 text(item.getConditionMedia()), text(item.getConditionSleeve()), text(item.getPurchaseDate()),
                 price(item.getPurchasePrice()), text(item.getPurchaseLocation()), text(item.getStorageLocation()),
-                text(item.getNotes()), item.getAddedAt() == null ? "" : ADDED_AT.format(item.getAddedAt()));
+                text(item.getNotes()), item.getAddedAt() == null ? "" : ADDED_AT.format(item.getAddedAt()),
+                item.getGenre() == null ? "" : item.getGenre().topLevel().getName(),
+                item.getGenre() != null && item.getGenre().isSubgenre() ? item.getGenre().getName() : "");
     }
 
     private static String text(Object value) {

@@ -81,8 +81,8 @@ class WishlistServiceIntegrationTest {
 
     @Test
     void addIsIdempotentAndPersonal() {
-        WishlistItemDto first = wishlistService.add(ALICE, new AddToWishlistRequest(MetadataSource.DISCOGS, "1", " cadeau "));
-        WishlistItemDto again = wishlistService.add(ALICE, new AddToWishlistRequest(MetadataSource.DISCOGS, "1", null));
+        WishlistItemDto first = wishlistService.add(ALICE, new AddToWishlistRequest(MetadataSource.DISCOGS, "1", " cadeau ", null));
+        WishlistItemDto again = wishlistService.add(ALICE, new AddToWishlistRequest(MetadataSource.DISCOGS, "1", null, null));
 
         assertThat(again.id()).isEqualTo(first.id());
         assertThat(first.title()).isEqualTo("Kid A");
@@ -94,7 +94,7 @@ class WishlistServiceIntegrationTest {
 
     @Test
     void candidatesShowWhetherTheyAreOnTheWishlist() {
-        wishlistService.add(ALICE, new AddToWishlistRequest(MetadataSource.DISCOGS, "1", null));
+        wishlistService.add(ALICE, new AddToWishlistRequest(MetadataSource.DISCOGS, "1", null, null));
         UUID alice = userService.getOrCreate(ALICE).getId();
         UUID bob = userService.getOrCreate(BOB).getId();
         List<ReleaseCandidateDto> candidates = List.of(new ReleaseCandidateDto(MetadataSource.DISCOGS, "1", "Radiohead",
@@ -106,10 +106,10 @@ class WishlistServiceIntegrationTest {
 
     @Test
     void acquireMovesTheWishToTheCollection() {
-        WishlistItemDto wish = wishlistService.add(ALICE, new AddToWishlistRequest(MetadataSource.DISCOGS, "1", null));
+        WishlistItemDto wish = wishlistService.add(ALICE, new AddToWishlistRequest(MetadataSource.DISCOGS, "1", null, null));
 
         CollectionItemDto item = wishlistService.acquire(ALICE, wish.id(),
-                new CollectionItemFields(MediaCondition.MINT, null, null, null, null, "Kast C", null));
+                new CollectionItemFields(MediaCondition.MINT, null, null, null, null, "Kast C", null, null));
 
         assertThat(item.release().title()).isEqualTo("Kid A");
         assertThat(item.conditionMedia()).isEqualTo(MediaCondition.MINT);
@@ -119,7 +119,7 @@ class WishlistServiceIntegrationTest {
 
     @Test
     void deleteRemovesOnlyTheWish() {
-        WishlistItemDto wish = wishlistService.add(ALICE, new AddToWishlistRequest(MetadataSource.DISCOGS, "1", null));
+        WishlistItemDto wish = wishlistService.add(ALICE, new AddToWishlistRequest(MetadataSource.DISCOGS, "1", null, null));
 
         wishlistService.delete(ALICE, wish.id());
 

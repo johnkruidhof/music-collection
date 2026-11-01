@@ -45,6 +45,11 @@ public class WishlistItem {
     @Column(length = 1000)
     private String notes;
 
+    /** Persoonlijk genre of subgenre (F-28); {@code null} = geen genre. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "genre_id")
+    private Genre genre;
+
     @CreatedDate
     @Column(name = "added_at", nullable = false, updatable = false)
     private Instant addedAt;

@@ -19,6 +19,9 @@ public record CollectionItemDto(
         String purchaseLocation,
         String storageLocation,
         String notes,
+        UUID genreId,
+        String genreName,
+        String subgenreName,
         Instant addedAt,
         Instant updatedAt) {
 }

@@ -99,7 +99,7 @@ class CollectionStatsServiceIntegrationTest {
         collectionService.add(jwt, new AddToCollectionRequest(null, null,
                 new ManualReleaseRequest(null, artist, "Titel", year, type, null, null, null, null, List.of()),
                 new CollectionItemFields(condition, null, null, price == null ? null : new BigDecimal(price),
-                        null, null, null)));
+                        null, null, null, null)));
     }
 
     private static Jwt jwt(String subject, String username) {

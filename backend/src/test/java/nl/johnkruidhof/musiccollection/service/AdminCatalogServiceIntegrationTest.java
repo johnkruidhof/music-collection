@@ -69,7 +69,7 @@ class AdminCatalogServiceIntegrationTest {
     void searchShowsUsageAndFindsByTextOrExactId() {
         collectionService.add(ALICE, fromDiscogs("1"));
         collectionService.add(BOB, fromDiscogs("1"));
-        wishlistService.add(BOB, new AddToWishlistRequest(MetadataSource.DISCOGS, "3", null));
+        wishlistService.add(BOB, new AddToWishlistRequest(MetadataSource.DISCOGS, "3", null, null));
 
         AdminReleasePageDto all = adminCatalogService.search(null, null, 0, 25);
         assertThat(all.content()).extracting(AdminReleaseDto::title, AdminReleaseDto::collectionCount,
@@ -86,9 +86,9 @@ class AdminCatalogServiceIntegrationTest {
     @Test
     void mergeMovesItemsAndWishesAndDeletesSource() {
         collectionService.add(ALICE, fromDiscogs("2"));
-        wishlistService.add(ALICE, new AddToWishlistRequest(MetadataSource.DISCOGS, "2", null));
-        wishlistService.add(BOB, new AddToWishlistRequest(MetadataSource.DISCOGS, "2", null));
-        wishlistService.add(BOB, new AddToWishlistRequest(MetadataSource.DISCOGS, "1", null));
+        wishlistService.add(ALICE, new AddToWishlistRequest(MetadataSource.DISCOGS, "2", null, null));
+        wishlistService.add(BOB, new AddToWishlistRequest(MetadataSource.DISCOGS, "2", null, null));
+        wishlistService.add(BOB, new AddToWishlistRequest(MetadataSource.DISCOGS, "1", null, null));
         UUID source = releaseRepository.findByDiscogsId("2").orElseThrow().getId();
         UUID target = releaseRepository.findByDiscogsId("1").orElseThrow().getId();
 
@@ -99,7 +99,7 @@ class AdminCatalogServiceIntegrationTest {
         // Alice' wens verhuist; Bob had het doel al op zijn lijst, dus zijn tweede wens vervalt.
         assertThat(merged.wishlistCount()).isEqualTo(2);
         assertThat(releaseRepository.findById(source)).isEmpty();
-        assertThat(collectionService.list(ALICE, null, null, null, 0, 24).content())
+        assertThat(collectionService.list(ALICE, null, null, null, null, 0, 24).content())
                 .extracting("title").containsExactly("OK Computer");
     }
 
@@ -107,7 +107,7 @@ class AdminCatalogServiceIntegrationTest {
     void onlyUnusedReleasesCanBeDeleted() {
         collectionService.add(ALICE, fromDiscogs("1"));
         UUID used = releaseRepository.findByDiscogsId("1").orElseThrow().getId();
-        wishlistService.add(ALICE, new AddToWishlistRequest(MetadataSource.DISCOGS, "3", null));
+        wishlistService.add(ALICE, new AddToWishlistRequest(MetadataSource.DISCOGS, "3", null, null));
         wishlistService.delete(ALICE, wishlistService.list(ALICE).getFirst().id());
         UUID unused = releaseRepository.findByDiscogsId("3").orElseThrow().getId();
 

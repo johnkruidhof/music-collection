@@ -42,7 +42,7 @@ class CollectionStatsControllerTest {
     void returnsStats() throws Exception {
         given(statsService.getStats(any())).willReturn(new CollectionStatsDto(3, new BigDecimal("42.49"), 2,
                 List.of(new CollectionStatsDto.MediaTypeCount(MediaType.VINYL, 2)),
-                List.of(new CollectionStatsDto.DecadeCount(null, 1)), List.of(), List.of()));
+                List.of(new CollectionStatsDto.DecadeCount(null, 1)), List.of(), List.of(), List.of()));
 
         mockMvc.perform(get("/api/collection/stats").with(jwt()))
                 .andExpect(status().isOk())

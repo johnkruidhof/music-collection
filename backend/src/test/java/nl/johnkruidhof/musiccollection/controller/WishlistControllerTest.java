@@ -61,7 +61,7 @@ class WishlistControllerTest {
                 new ReleaseDto(UUID.randomUUID(), null, "Radiohead", "Kid A", 2000,
                         nl.johnkruidhof.musiccollection.entity.MediaType.VINYL, null, null, null, null, null, null,
                         MetadataSource.DISCOGS, "1", null, List.of()),
-                null, null, null, null, null, null, null, Instant.now(), Instant.now()));
+                null, null, null, null, null, null, null, null, null, null, Instant.now(), Instant.now()));
 
         mockMvc.perform(post("/api/wishlist/" + ID + "/acquire").with(jwt()))
                 .andExpect(status().isCreated())

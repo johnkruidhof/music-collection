@@ -117,7 +117,7 @@ class ImportExportIntegrationTest {
                 new ManualReleaseRequest(null, "De Dijk", "Nooit meer slapen; live", 1985, MediaType.VINYL, null, null,
                         null, null, List.of()),
                 new CollectionItemFields(MediaCondition.VERY_GOOD, null, null, new BigDecimal("12.50"), null,
-                        "Kast A", "Met \"handtekening\"")));
+                        "Kast A", "Met \"handtekening\"", null)));
 
         String csv = exportService.exportCsv(ALICE);
 

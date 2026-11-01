@@ -6,7 +6,10 @@ import java.util.UUID;
 import nl.johnkruidhof.musiccollection.entity.MediaCondition;
 import nl.johnkruidhof.musiccollection.entity.MediaType;
 
-/** Compacte weergave voor het collectie-overzicht (geen tracks). */
+/**
+ * Compacte weergave voor het collectie-overzicht (geen tracks). {@code genreName} is het hoofdgenre,
+ * {@code subgenreName} gevuld als het item een subgenre heeft (F-28).
+ */
 public record CollectionItemSummaryDto(
         UUID id,
         UUID releaseId,
@@ -18,5 +21,8 @@ public record CollectionItemSummaryDto(
         String coverThumbnailUrl,
         MediaCondition conditionMedia,
         String storageLocation,
+        UUID genreId,
+        String genreName,
+        String subgenreName,
         Instant addedAt) {
 }

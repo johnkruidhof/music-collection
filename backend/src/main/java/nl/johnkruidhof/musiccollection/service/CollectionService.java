@@ -44,7 +44,10 @@ public class CollectionService {
             "added", "addedAt",
             "artist", "release.artist",
             "title", "release.title",
-            "year", "release.releaseYear");
+            "year", "release.releaseYear",
+            "genre", "genre.path");
+    /** Filterwaarde voor items zonder genre. */
+    public static final String NO_GENRE = "none";
 
     private final CollectionItemRepository collectionItemRepository;
     private final ReleaseRepository releaseRepository;
@@ -52,13 +55,17 @@ public class CollectionService {
     private final UserService userService;
     private final CollectionItemMapper collectionItemMapper;
     private final TransactionTemplate transactionTemplate;
+    private final GenreService genreService;
 
     /**
-     * @param sort {@code veld[,asc|desc]} met veld {@code added}, {@code artist}, {@code title} of {@code year};
-     *             standaard {@code added,desc} (nieuwste eerst)
+     * @param genre id van een genre (inclusief subgenres), {@link #NO_GENRE} voor items zonder genre, of leeg
+     * @param sort  {@code veld[,asc|desc]} met veld {@code added}, {@code artist}, {@code title}, {@code year} of
+     *              {@code genre} (gegroepeerd per genre/subgenre, zonder genre achteraan); standaard
+     *              {@code added,desc} (nieuwste eerst)
      */
     @Transactional
-    public CollectionPageDto list(Jwt jwt, String q, MediaType mediaType, String sort, int page, int size) {
+    public CollectionPageDto list(Jwt jwt, String q, MediaType mediaType, String genre, String sort, int page,
+            int size) {
         if (page < 0 || size < 1 || size > MAX_PAGE_SIZE) {
             throw new InvalidRequestException("page moet ≥ 0 zijn en size tussen 1 en " + MAX_PAGE_SIZE + ".");
         }
@@ -66,6 +73,8 @@ public class CollectionService {
         Specification<CollectionItem> spec = Specification.allOf(
                 CollectionItemSpecifications.ownedBy(user.getId()),
                 CollectionItemSpecifications.hasMediaType(mediaType),
+                CollectionItemSpecifications.hasGenre(parseGenreFilter(genre)),
+                CollectionItemSpecifications.withoutGenre(NO_GENRE.equals(genre)),
                 CollectionItemSpecifications.matchesText(q));
         Page<CollectionItem> result = collectionItemRepository.findAll(spec, PageRequest.of(page, size, parseSort(sort)));
         return new CollectionPageDto(result.map(collectionItemMapper::toSummary).getContent(),
@@ -96,7 +105,14 @@ public class CollectionService {
                     ? releaseRepository.findById(releaseId).orElseThrow(() -> new ResourceNotFoundException("Release", releaseId))
                     : catalogService.createManual(request.release());
             CollectionItem item = new CollectionItem(user, release);
-            collectionItemMapper.applyFields(request.fields() == null ? CollectionItemFields.EMPTY : request.fields(), item);
+            CollectionItemFields fields = request.fields() == null ? CollectionItemFields.EMPTY : request.fields();
+            collectionItemMapper.applyFields(fields, item);
+            if (fields.genreId() != null) {
+                item.setGenre(genreService.resolve(user.getId(), fields.genreId()));
+                genreService.learn(user.getId(), release.getArtist(), item.getGenre());
+            } else {
+                item.setGenre(genreService.suggest(user.getId(), release.getArtist()).orElse(null));
+            }
             return collectionItemMapper.toDto(collectionItemRepository.saveAndFlush(item));
         });
     }
@@ -105,6 +121,10 @@ public class CollectionService {
     public CollectionItemDto update(Jwt jwt, UUID id, CollectionItemFields fields) {
         CollectionItem item = findOwned(jwt, id);
         collectionItemMapper.applyFields(fields, item);
+        UUID userId = item.getUser().getId();
+        item.setGenre(fields.genreId() == null ? null : genreService.resolve(userId, fields.genreId()));
+        // Zelf gekozen genre onthouden voor deze artiest (voorstel bij een volgende release).
+        genreService.learn(userId, item.getRelease().getArtist(), item.getGenre());
         return collectionItemMapper.toDto(collectionItemRepository.saveAndFlush(item));
     }
 
@@ -149,9 +169,21 @@ public class CollectionService {
             throw new InvalidRequestException("Ongeldige sortering '" + sort + "': gebruik "
                     + String.join(", ", SORT_FIELDS.keySet().stream().sorted().toList()) + " met optioneel ,asc of ,desc.");
         }
-        Sort primary = Sort.by(Sort.Direction.fromString(direction), path);
+        Sort.Order order = new Sort.Order(Sort.Direction.fromString(direction), path);
+        Sort primary = Sort.by(path.equals("genre.path") ? order.nullsLast() : order);
         return path.equals("addedAt")
                 ? primary
                 : primary.and(Sort.by("release.artist", "release.title", "addedAt"));
+    }
+
+    private static UUID parseGenreFilter(String genre) {
+        if (genre == null || genre.isBlank() || NO_GENRE.equals(genre)) {
+            return null;
+        }
+        try {
+            return UUID.fromString(genre);
+        } catch (IllegalArgumentException ex) {
+            throw new InvalidRequestException("Ongeldig genre-filter: gebruik een genre-id of '" + NO_GENRE + "'.");
+        }
     }
 }
